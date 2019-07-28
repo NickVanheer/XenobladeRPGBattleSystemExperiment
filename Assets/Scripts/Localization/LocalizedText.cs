@@ -12,6 +12,7 @@ public class LocalizedText : MonoBehaviour
         if (LocalizationManager.Instance.GetIsReady() == false)
             return;
         UpdateLocalization();
+        GameManager.Instance.OnLocalizationChanged.AddListener(() => UpdateLocalization());
     }
 
     public void UpdateLocalization()

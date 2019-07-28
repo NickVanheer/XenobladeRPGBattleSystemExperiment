@@ -20,6 +20,7 @@ public class LocalizedTextEditor : EditorWindow
     int maxTextCount = 99;
 
     float sideMargins = 10;
+    bool hasFile = false;
 
     [MenuItem("Window/Localization Editor")]
     static void Init()
@@ -30,10 +31,22 @@ public class LocalizedTextEditor : EditorWindow
     private void OnGUI()
     {
         GUILayout.Space(sideMargins);
+
+        GUILayout.BeginHorizontal(GUILayout.Height(30));
+        GUILayout.Space(sideMargins);
+
         if (GUILayout.Button("Create new localization data"))
             CreateNewData();
-        GUILayout.Space(50);
+        if (GUILayout.Button("Open data file"))
+            LoadGameData();
+        GUILayout.Space(sideMargins);
+        GUILayout.EndHorizontal();
 
+        if (!hasFile)
+            return;
+
+        //
+        GUILayout.Space(50);
         EditorGUILayout.LabelField("Data input", EditorStyles.boldLabel);
 
         //Text limits and its input
@@ -64,8 +77,10 @@ public class LocalizedTextEditor : EditorWindow
             EditorGUI.HelpBox(new Rect(20, 35, 400, 40), "Now editing: " + filename, MessageType.Info);
            
             key = EditorGUILayout.TextField("Key: ", key);
-            japanese = EditorGUILayout.TextField("Japanese: ", japanese);
-            english = EditorGUILayout.TextField("English: ", english);
+            GUILayout.Label("English");
+            english = EditorGUILayout.TextArea(english, GUILayout.Height(40));
+            GUILayout.Label("Japanese");
+            japanese = EditorGUILayout.TextArea(japanese, GUILayout.Height(40));
 
             if (isTextLimited)
             {
@@ -120,18 +135,18 @@ public class LocalizedTextEditor : EditorWindow
 
         GUILayout.BeginHorizontal(GUILayout.Height(30));
         GUILayout.Space(sideMargins);
-        if (GUILayout.Button("Save As"))
+
+        if (GUILayout.Button("Save Current"))
+        {
+            SaveGameDataToSameFileName();
+        }
+
+        if (GUILayout.Button("Save as new"))
         {
             SaveGameData();
         }
-        if (GUILayout.Button("Open data file"))
-        {
-            LoadGameData();
-        }
         GUILayout.Space(sideMargins);
         GUILayout.EndHorizontal();
-
-
 
     }
 
@@ -147,6 +162,7 @@ public class LocalizedTextEditor : EditorWindow
             string dataAsJson = File.ReadAllText(filePath);
             filename = Path.GetFileName(filePath);
             LocalizationData = JsonUtility.FromJson<LocalizationData>(dataAsJson);
+            hasFile = true;
         }
     }
 
@@ -158,6 +174,17 @@ public class LocalizedTextEditor : EditorWindow
         {
             string dataAsJson = JsonUtility.ToJson(LocalizationData);
             File.WriteAllText(filePath, dataAsJson);
+            hasFile = true;
+        }
+    }
+
+    private void SaveGameDataToSameFileName()
+    {
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            string dataAsJson = JsonUtility.ToJson(LocalizationData);
+            File.WriteAllText(filePath, dataAsJson);
+            hasFile = true;
         }
     }
 

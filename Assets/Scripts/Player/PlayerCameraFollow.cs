@@ -8,26 +8,20 @@ public class PlayerCameraFollow : MonoBehaviour {
     public Transform LookAt;
     public float ScrollSpeed = 1;
     public float LerpFactor = 0.05f;
-
-    private Vector3 offset;
-
-    public Vector3 CameraOffset;
     public bool IsLookAt = false;
 
+    public int zoomLevel = 3;
+    public Vector3 GlobalCameraOffset;
+    public Vector3 OffsetOnZoom = new Vector3(12, -19, 16);
+
+    private Vector3 cameraVector;
     private Vector3 transitionVector;
     private bool isTransition = false;
-
-    private Vector3 targetOffset;
-
-    public Vector3 NearOffset = new Vector3(12,-19,16);
-    public Vector3 FarOffset = new Vector3(0,-9,0);
-    public float offsetSpeed = 0.25f;
-
-    public int StartZoomLevel = 4;
-    public int zoomLevel = 4;
+    public Vector3 zoomOffset;
+    //private Vector3 cameraOffset;
 
     void Start () {
-        offset = transform.position - Player.transform.position;
+        cameraVector = transform.position - Player.transform.position;
 
         if (LookAt == null && Player != null)
             LookAt = Player.transform;
@@ -39,20 +33,20 @@ public class PlayerCameraFollow : MonoBehaviour {
             Assert.IsFalse(true, "Either Player or LookAt should have a value");
 
         SetTransition(new Vector3(60, 60, 160));
-        SetZoomLevel(StartZoomLevel);
+       // SetZoomLevel(StartZoomLevel);
         //SetOffset(FarOffset);
     }
 
     void Update()
     {
         Vector3 target = Player.transform.position;
-        CameraOffset = Vector3.Lerp(CameraOffset, targetOffset, offsetSpeed);
+        //cameraOffset = Vector3.Lerp(cameraOffset, ZoomOffset, OffsetSpeed);
 
         //When we're in battle, focus on the point inbetween the player and the enemy for a better viewing angle of the action
         if(Player.GetComponent<RPGActor>().State == ActorState.Engaged && Player.GetComponent<RPGActor>().TargetObject != null)
             target = (Player.transform.position + Player.GetComponent<RPGActor>().TargetObject.transform.position) / 2;
 
-        transform.position = Vector3.Lerp(transform.position, target + offset + CameraOffset + transitionVector, LerpFactor);
+        transform.position = Vector3.Lerp(transform.position, target + cameraVector + zoomOffset + transitionVector + GlobalCameraOffset, LerpFactor);
 
         if (IsLookAt)
             transform.LookAt(LookAt.transform);
@@ -77,7 +71,7 @@ public class PlayerCameraFollow : MonoBehaviour {
         if (zoomLevel - 1 <= 0)
             return;
 
-        targetOffset = targetOffset + new Vector3(-12, 19, -16) * 0.5f;
+        zoomOffset = zoomOffset + new Vector3(-OffsetOnZoom.x, -OffsetOnZoom.y, -OffsetOnZoom.z) * 0.5f;
         zoomLevel--;
     }
 
@@ -86,13 +80,13 @@ public class PlayerCameraFollow : MonoBehaviour {
         if (zoomLevel + 1 == 8)
             return;
 
-        targetOffset = targetOffset + new Vector3(12, -19, 16) * 0.5f;
+        zoomOffset = zoomOffset + new Vector3(OffsetOnZoom.x, OffsetOnZoom.y, OffsetOnZoom.z) * 0.5f;
         zoomLevel++;
     }
 
     public void SetOffset(Vector3 pos)
     {
-        targetOffset = pos;
+        zoomOffset = pos;
     }
 
     public void SetTransition(Vector3 vec)

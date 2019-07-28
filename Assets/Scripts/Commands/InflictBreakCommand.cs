@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class InflictBreakCommand : Command {
 
-    public InflictBreakCommand()
-    {
-    }
-
-    // Use this for initialization
     void Start () {
         Cooldown = 15;
         Name = "Break Slash";

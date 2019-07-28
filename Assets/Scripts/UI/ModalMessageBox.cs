@@ -27,7 +27,6 @@ public class ModalMessageBox : NovaUIElement {
     public Color HighlightColor = Color.yellow;
     private List<GameObject> dialogOptionObjects; //the in-code instantiated text objects
     private List<UnityAction> dialogOptionActions; //the actions related to the in-code instantiated text objects
-
  
     //Selection option
     private bool isSelectingOption = false;
@@ -69,7 +68,7 @@ public class ModalMessageBox : NovaUIElement {
     public void AddDialogOption(string text, UnityAction action)
     {
         //GameObject gO = Instantiate(CommandLineToInstantiate) as GameObject;
-        //create text object yourself
+        //Manually create this so we might have more control when needed.
         GameObject gO = new GameObject();
         gO.AddComponent<RectTransform>();
         gO.AddComponent<LayoutElement>();
@@ -77,7 +76,7 @@ public class ModalMessageBox : NovaUIElement {
         Text t = gO.AddComponent<Text>();
         t.text = text;
         t.font = CoreUIManager.Instance.GameFont;
-        t.fontSize = 32;
+        t.fontSize = 20;
         t.resizeTextForBestFit = true;
 
         gO.transform.SetParent(DialogOptionsHolder.transform);
@@ -99,20 +98,6 @@ public class ModalMessageBox : NovaUIElement {
         }
 
         isSelectingOption = false;
-    }
-
-    //todo name inconsistency
-    void RefreshPointer()
-    {
-        return;
-
-        //todo fix pointer
-        RectTransform trans = dialogOptionObjects[selectedIndex].GetComponent<RectTransform>();
-        
-        Vector3 position = trans.anchoredPosition;
-        position = Camera.main.ScreenToWorldPoint(position);
-       //position = new Vector3(position.x, position.y, 1);
-        //CoreUIManager.Instance.SetPointer2D(position);
     }
 
     public void DeleteModalOptionsAndActions()
@@ -232,14 +217,19 @@ public class ModalMessageBox : NovaUIElement {
         displayNewText(dialogueLines[dialogueIndex]);
     }
 
-    //shows dialog with one textline
+    //shows dialog, split lines with \n
     public void Show(string txt, bool pauseGame = false)
     {
         base.Show(pauseGame);
         
         dialogueIndex = 0;
 
-        AddDialogue(txt);
+        var lines = txt.Split('\n');
+
+        foreach (var line in lines)
+        {
+            AddDialogue(line);
+        }
 
         displayNewText(dialogueLines[dialogueIndex]);
         Debug.Log("Showing MessageBox (text: " + txt + ") and waiting for user input.");
@@ -298,7 +288,5 @@ public class ModalMessageBox : NovaUIElement {
     {
         selectedIndex += value;
         selectedIndex = Mathf.Clamp(selectedIndex, 0, dialogOptionObjects.Count - 1);
-
-        RefreshPointer();
     }
 }

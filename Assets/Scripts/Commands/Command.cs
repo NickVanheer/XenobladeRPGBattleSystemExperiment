@@ -27,26 +27,6 @@ public enum CommandType
     SpecialBattleCommand
 }
 
-/*
-public class Skill
-{
-    public string Name;
-    public string Description;
-    public int Damage;
-    public int Cost = 0;
-    public CommandType Type;
-    public UnityAction ActionVariable;
-    public string Illustration;
-    public int Slot;
-    public int Cooldown;
-    public bool IsInflictBreak;
-    public bool IsInflictTopple;
-    public MagicElemancy Element;
-
-}
-
-*/
-
 public class Command : MonoBehaviour
 {
     public string Name;
@@ -61,17 +41,16 @@ public class Command : MonoBehaviour
     public bool IsInflictTopple;
     public MagicElemancy Element;
 
-    //public Skill SkillData = new Skill();
-
     public GameObject ParticleCommandEffect;
 
     //needed when we select the skill with mouse.
     public int SkillIndex;
+    public float StartCooldown = 0f;
     public float Cooldown = 10f;
     public float CurrentCooldown;
     public bool IsCooledDown = false;
-
     public bool IsEnabled = false;
+    public bool IsAlwaysActiveCommand = false;
 
     public void Update()
     {
@@ -79,7 +58,7 @@ public class Command : MonoBehaviour
         if (leader.GetComponent<RPGActor>().State != ActorState.Engaged)
             return;
 
-        if (!IsEnabled)
+        if (IsAlwaysActiveCommand || !IsEnabled)
             return;
 
         if (!IsCooledDown)
@@ -139,6 +118,10 @@ public class Command : MonoBehaviour
     public bool CanExecute()
     {
         bool canUse = true;
+
+        if (IsAlwaysActiveCommand)
+            return canUse;
+
         if (Cost > 0)
         {
             canUse = ChainBarDisplayController.Instance.HasSegmentReady();
@@ -153,11 +136,12 @@ public class Command : MonoBehaviour
         return true;
     }
 
-    public void ResetCommand()
+    public virtual void ResetCommand()
     {
         IsCooledDown = false;
-        CurrentCooldown = Cooldown;
-        IsEnabled = false;
+        StartCooldown = Cooldown; //By default the cooldown at the beginning of battle is the full cooldown, override in derrived or save/load a value from somewhere (i.e: a character growth system) to change
+        CurrentCooldown = StartCooldown;
+        IsEnabled = true;
     }
 
     public void UseCommand()
@@ -176,5 +160,15 @@ public class Command : MonoBehaviour
 
         if (ActionVariable != null)
             ActionVariable.Invoke();
+    }
+
+    public virtual string GetName()
+    {
+        return Name;
+    }
+
+    public virtual string GetDescription()
+    {
+        return Description;
     }
 }

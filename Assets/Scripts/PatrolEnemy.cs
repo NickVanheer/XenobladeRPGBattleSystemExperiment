@@ -3,13 +3,13 @@ using System.Collections;
 
 public class PatrolEnemy : MonoBehaviour {
 
-    [Range(1f, 50.0f)]
+    [Range(1f, 250.0f)]
     public float MoveSpeed = 20;
 
     [Range(1f, 100.0f)]
     public float Slerp = 20;
 
-    [Range(1f, 30.0f)]
+    [Range(1f, 150.0f)]
     public float HorizontalRange = 10;
 
     public bool IsDestroyAtEnd = false;

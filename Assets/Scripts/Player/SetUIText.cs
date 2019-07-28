@@ -59,7 +59,7 @@ public class SetUIText : MonoBehaviour {
                 RPGActor leaderActor = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>();
                 Command c = leaderActor.GetCommandAtSlotIndex(SkillbarController.Instance.SelectedIndex);
                 if(c != null)
-                    GetComponent<Text>().text = c.Name;
+                    GetComponent<Text>().text = c.GetName();
 
 
             }
@@ -74,7 +74,7 @@ public class SetUIText : MonoBehaviour {
                 RPGActor leaderActor = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>();
                 Command c = leaderActor.GetCommandAtSlotIndex(SkillbarController.Instance.SelectedIndex);
                 if (c != null)
-                    GetComponent<Text>().text = c.Description;
+                    GetComponent<Text>().text = c.GetDescription();
             }
         }
     }

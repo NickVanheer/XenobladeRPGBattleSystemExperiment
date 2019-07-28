@@ -9,8 +9,6 @@ public class BossSphereEnemyAI : BaseAI {
     bool isSpecialUsed = false;
     float aoeTimer;
 
-    public Transform BossRoomCenter;
-
     public override void DefaultAttack()
     {
         if(aoeTimer > AoECooldown)
@@ -23,12 +21,12 @@ public class BossSphereEnemyAI : BaseAI {
                 GameManager.Instance.SpawnAoE(this.gameObject, GameManager.Instance.GetPartyLeaderFloorObject().transform.position, 20, 4f, 4.0f);
 
             if(kind == 1)
-                GameManager.Instance.SpawnTwoRectangleAoE(this.gameObject, BossRoomCenter.position, 20, 3.0f);
+                GameManager.Instance.SpawnTwoRectangleAoE(this.gameObject, GetFloorPosition(), 20, 3.0f);
         }
 
         if (actor.Properties.GetHealthPercentage() < 50 && !isSpecialUsed)
         {
-            GameManager.Instance.SpawnAoE(this.gameObject, GameManager.Instance.GetFloorInUnit(this.transform.gameObject).transform.position, 60, 3f, 3.0f);
+            GameManager.Instance.SpawnAoE(this.gameObject, GetFloorPosition(), 60, 3f, 3.0f);
             CoreUIManager.Instance.SpawnLabel("Blaze", actor.gameObject);
             isSpecialUsed = true;
             return;

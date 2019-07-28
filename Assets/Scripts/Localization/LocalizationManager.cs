@@ -24,7 +24,7 @@ public class LocalizationManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        Debug.Log("Loc Awake!"); 
+        Debug.Log("LocalizationManager Awake!"); 
     }
 
     public void LoadLocalizedText(string fileName)

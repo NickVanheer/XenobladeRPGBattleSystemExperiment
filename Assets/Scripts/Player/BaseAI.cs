@@ -128,4 +128,10 @@ public abstract class BaseAI : MonoBehaviour {
         actor.DoDamageAttackOnCurrentTarget(dmg);
     }
 
+    public Vector3 GetFloorPosition()
+    {
+        GameObject gO = GameManager.Instance.GetFloorInUnit(this.transform.gameObject);
+        return gO.transform.position;
+    }
+
 }

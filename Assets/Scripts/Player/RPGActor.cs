@@ -629,6 +629,12 @@ public class RPGActor : MonoBehaviour {
             command.ActionVariable.Invoke();
     }
 
+    public void ResetCommands()
+    {
+        foreach (var command in PartyMemberCommands)
+            command.ResetCommand();
+    }
+
     public Command GetCommandAtSlotIndex(int i)
     {
         foreach (var command in PartyMemberCommands)

@@ -5,8 +5,8 @@ using UnityEngine;
 public class FireAggroPull : Command {
 
     void Start () {
-        Name = "Fire Slash";
-        Description = "A fire elemental slash that draws aggro.";
+        Name = LocalizationManager.Instance.GetLocalizedValue("skillFireAggroPull_N");
+        Description = LocalizationManager.Instance.GetLocalizedValue("skillFireAggroPull_D");
         Slot = 4;
         Cooldown = 35;
         Element = MagicElemancy.Fire;
@@ -20,7 +20,6 @@ public class FireAggroPull : Command {
         };
 
         ResetCommand();
-        IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
     }
 }

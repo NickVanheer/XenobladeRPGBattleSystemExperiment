@@ -6,9 +6,9 @@ public class BackSlashCommand : Command
 {
 	void Start () {
 
-       Name = "Back Slash";
-       Description = "A powerful slash. Bonus damage from the back.";
-       Slot = 3;
+        Name = LocalizationManager.Instance.GetLocalizedValue("skillBackslash_N");
+        Description = LocalizationManager.Instance.GetLocalizedValue("skillBackslash_D");
+        Slot = 3;
        Cooldown = 15;
        Illustration = "Skills/BackSlash";
        ActionVariable += () =>
@@ -27,7 +27,6 @@ public class BackSlashCommand : Command
         };
 
         ResetCommand();
-        IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
     }
 }

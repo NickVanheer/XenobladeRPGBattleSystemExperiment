@@ -7,9 +7,9 @@ public class CureSlashCommand : Command {
     // Use this for initialization
     void Start () {
 
-       Name = "Cure Slash";
-       Description = "A slash that spawns a health potion.";
-       Slot = 0;
+        Name = LocalizationManager.Instance.GetLocalizedValue("skillCureslash_N");
+        Description = LocalizationManager.Instance.GetLocalizedValue("skillCureslash_D");
+        Slot = 0;
        Cost = 1;
        Cooldown = 40;
        Illustration = "Skills/SwordCure";
@@ -21,7 +21,6 @@ public class CureSlashCommand : Command {
         };
 
         ResetCommand();
-        IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
     }
 }

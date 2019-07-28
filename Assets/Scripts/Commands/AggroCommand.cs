@@ -10,7 +10,7 @@ public class AggroCommand : Command {
 
     // Use this for initialization
     void Start () {
-        Cooldown = 15;
+        Cooldown = 25;
         Name = "Aggro Slash";
         ActionVariable += () =>
         {
@@ -24,7 +24,13 @@ public class AggroCommand : Command {
         };
 
         ResetCommand();
-        IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
 	}
+
+    public override void ResetCommand()
+    {
+        base.ResetCommand();
+        StartCooldown = 10;
+        CurrentCooldown = 10;
+    }
 }

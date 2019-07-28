@@ -86,6 +86,12 @@ public class PlayerTargetNearest : MonoBehaviour {
         CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
         CoreUIManager.Instance.ShowSkillDisplay();
 
+        //Reset all skills and their cooldowns
+        foreach (var player in GameManager.Instance.CurrentPartyMembers)
+        {
+            player.GetComponent<RPGActor>().ResetCommands();
+        }
+
         HasSoftTarget = true;
     }
 

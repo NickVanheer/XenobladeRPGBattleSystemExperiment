@@ -199,7 +199,6 @@ public class CoreUIManager : MonoBehaviour {
         {
             if(child.name == "HealthSlider")
             {
-                //TODO: safe
                 child.GetComponent<HealthSlider>().ActorToShow = targetToShow.GetComponent<RPGActor>();
             }
         }

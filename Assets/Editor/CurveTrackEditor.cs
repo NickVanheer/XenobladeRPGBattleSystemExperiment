@@ -53,14 +53,14 @@ public class CurveTrackEditor : Editor {
     {
         var simpleSpline = (CurveTrack)target;
 
-        simpleSpline.StartControlPoint = Handles.FreeMoveHandle(simpleSpline.StartControlPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.CircleCap);
-        simpleSpline.EndControlPoint = Handles.FreeMoveHandle(simpleSpline.EndControlPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.CircleCap);
+        simpleSpline.StartControlPoint = Handles.FreeMoveHandle(simpleSpline.StartControlPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.CircleHandleCap);
+        simpleSpline.EndControlPoint = Handles.FreeMoveHandle(simpleSpline.EndControlPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.CircleHandleCap);
 
         Vector3 originalStart = simpleSpline.StartPoint;
         Vector3 originalEnd = simpleSpline.EndPoint;
 
-        Vector3 moveStart = Handles.FreeMoveHandle(simpleSpline.StartPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.RectangleCap);
-        Vector3 moveEnd = Handles.FreeMoveHandle(simpleSpline.EndPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.RectangleCap);
+        Vector3 moveStart = Handles.FreeMoveHandle(simpleSpline.StartPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.RectangleHandleCap);
+        Vector3 moveEnd = Handles.FreeMoveHandle(simpleSpline.EndPoint, Quaternion.identity, 0.2f, Vector3.zero, Handles.RectangleHandleCap);
 
         Vector3 startDelta = moveStart - originalStart;
         Vector3 endDelta = moveEnd - originalEnd;

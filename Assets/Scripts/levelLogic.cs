@@ -32,6 +32,8 @@ public class levelLogic : MonoBehaviour {
     [Header("Debug")]
     public bool IsStartAtSpawnPoint2 = false;
 
+    public GameObject BossObject = null;
+
     public void Start()
     {
         CoreUIManager.Instance.ShowQuickInfoPanel("Welcome");
@@ -50,7 +52,7 @@ public class levelLogic : MonoBehaviour {
             EventQueue.Instance.AddAction(() => { Phase1Door.GetComponent<SmoothMoveToPosition>().enabled = true; });
             EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(Phase1Door); });
             EventQueue.Instance.WaitABit(3f);
-            EventQueue.Instance.AddQuickInfoPanel("Something happened...", 2);
+            EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("SomethingChanged"), 2);
             //CoreUIManager.Instance.ShowQuickInfoPanel("Something happened...");
 
             Phase1DestroyedCount = 0;
@@ -82,7 +84,7 @@ public class levelLogic : MonoBehaviour {
 
     public void SpawnIntroMessage()
     {
-        CoreUIManager.Instance.ShowMessageBox("Welcome! Use skills, evade attacks and watch out for your health as you beat enemies");
+        CoreUIManager.Instance.ShowMessageBox(LocalizationManager.Instance.GetLocalizedValue("welcomeNodeText"));
     }
 
     public void IncreaseBossLevel()
@@ -97,12 +99,25 @@ public class levelLogic : MonoBehaviour {
 
     public void SpawnBoss()
     {
+        if (BossObject != null)
+            Destroy(BossObject);
+
         if(BossPrefab != null)
         {
-           GameObject gO = GameObject.Instantiate(BossPrefab, BossSpawnPoint.transform.position, Quaternion.identity);
-            gO.GetComponent<RPGActor>().Properties.ChangeLevel(BossLevel);
+            BossObject = GameObject.Instantiate(BossPrefab, BossSpawnPoint.transform.position, Quaternion.identity);
+            BossObject.GetComponent<RPGActor>().Properties.ChangeLevel(BossLevel);
 
-            //Todo zoom
+            EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(BossObject); });
         }
+    }
+
+    public void SwitchToJapanese()
+    {
+        GameManager.Instance.ChangeLanguage(DisplayLanguage.Japanese);
+    }
+
+    public void SwitchToEnglish()
+    {
+        GameManager.Instance.ChangeLanguage(DisplayLanguage.English);
     }
 }

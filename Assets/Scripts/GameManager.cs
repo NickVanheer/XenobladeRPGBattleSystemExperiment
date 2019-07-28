@@ -94,11 +94,17 @@ public class BattleState : GameState
 
         SkillbarController.Instance.EnableAllSkills();
 
-        //TODO: Delete to allow the player to engage with multiple enemies
+        //Delete to allow the player to engage with multiple enemies
         SkillbarController.Instance.ToggleAutoAttackSkill(false);
         CoreUIManager.Instance.ShowSkillDisplay();
 
-        //Initiate battle command Icon
+        //Reset all skills and their cooldowns
+        foreach (var player in gameManager.CurrentPartyMembers)
+        {
+            player.GetComponent<RPGActor>().ResetCommands();
+        }
+
+        //Disable initiate battle command icon
         Command startBattleCommand = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().GetCommandAtSlotIndex(2);
         startBattleCommand.IsEnabled = false; 
     }
@@ -234,6 +240,8 @@ public class GameManager : MonoBehaviour {
 
     public DisplayLanguage GameLanguage;
     public string LocalizationFileName;
+
+    public UnityEvent OnLocalizationChanged;
 
     void Awake()
     {
@@ -565,6 +573,15 @@ public class GameManager : MonoBehaviour {
         UnityAction noAction = () => { SceneManager.LoadScene(0); };
 
         CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to reload the level and try again?", yesAction, noAction);
+    }
+
+    public void ChangeLanguage(DisplayLanguage language)
+    {
+        this.GameLanguage = language;
+        if (OnLocalizationChanged != null)
+            OnLocalizationChanged.Invoke();
+        EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("LanguageChanged"), 1);
+
     }
 
     public void Log(string text)

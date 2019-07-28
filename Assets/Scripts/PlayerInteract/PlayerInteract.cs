@@ -21,11 +21,17 @@ public class PlayerInteract : MonoBehaviour {
 
     void Update()
     {
-        if (GameManager.Instance.IsPausedForUI)
-            return;
-
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            if (GameManager.Instance.IsPausedForUI)
+                return;
+
+            if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().State != ActorState.Idle)
+                return;
+
+            if (GameManager.Instance.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget)
+                return;
+
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, InteractDistance);
             int i = 0;
             while (i < hitColliders.Length)
@@ -40,5 +46,11 @@ public class PlayerInteract : MonoBehaviour {
                 i++;
             }
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, InteractDistance);
     }
 }
