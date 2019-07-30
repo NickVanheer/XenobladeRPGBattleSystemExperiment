@@ -13,32 +13,38 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public string TriggerToFire;
 
     [Header("Show object when player is near")]
-    public GameObject ObjectToShowWhenPlayerIsNear;
     public GameObject Player;
 
     [Header("Properties")]
     public InteractType TypeOfInteraction;
     public List<string> AffectedByTag;
-    public bool IsAlwaysShowInteractionDisplay = false;
-    public bool IsInteractionDisplayGoneAfterFirstInteract = false;
-
+ 
+    public float DiscoverRange = 4;
     public UnityEvent ActionVariable;
 
+    public bool IsIncreaseLightIntensity = true;
+    public float NearbyLightIntensity = 5f;
+    public float DefaultLightIntensity = 1f;
+
+    public void Start()
+    {
+        if (Player == null)
+            Player = GameManager.Instance.GetPartyLeader();
+
+        DiscoverRange = 7f;
+    }
+
+    //Todo: reformat
     public void Update()
     {
-        if (ObjectToShowWhenPlayerIsNear != null)
+        if (IsIncreaseLightIntensity)
         {
             float pos = Vector3.Distance(transform.position, Player.transform.position);
 
-            if(Mathf.Abs(pos) < 7 || IsAlwaysShowInteractionDisplay)
-            {
-                ObjectToShowWhenPlayerIsNear.SetActive(true);
-            }
+            if (IsIncreaseLightIntensity && Mathf.Abs(pos) < DiscoverRange)
+                transform.GetChild(1).GetComponent<Light>().intensity = NearbyLightIntensity;
             else
-            {
-                ObjectToShowWhenPlayerIsNear.SetActive(false);
-            }
-
+                transform.GetChild(1).GetComponent<Light>().intensity = DefaultLightIntensity;
         }
     }
     public void Interact()

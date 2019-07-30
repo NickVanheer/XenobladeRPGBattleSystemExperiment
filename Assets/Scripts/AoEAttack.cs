@@ -50,7 +50,11 @@ public class AoEAttack : MonoBehaviour {
             CheckIntersect();
             foreach (var actor in foundActors)
             {
-                Instigator.GetComponent<RPGActor>().DoDamageAttack(Damage, MagicElemancy.Fire, actor, 3f);
+                if(actor.GetComponent<RPGActor>().IsLeader)
+                    Instigator.GetComponent<RPGActor>().DoDamageAttack(Damage, MagicElemancy.Fire, actor, 3f);
+                else
+                    Instigator.GetComponent<RPGActor>().DoDamageAttack(1, MagicElemancy.None, actor, 2f); //damage party members too but only a little
+
                 CoreUIManager.Instance.SpawnLabel("AoE", actor, true);
             }
            
@@ -83,7 +87,7 @@ public class AoEAttack : MonoBehaviour {
         {
             foreach (var col in hits)
             {
-                if (col.tag == "Player" && col.GetComponent<RPGActor>().IsLeader)
+                if (col.tag == "Player")
                 {
                     foundActors.Add(col.gameObject);
                 }
@@ -105,7 +109,7 @@ public class AoEAttack : MonoBehaviour {
             {
                 foreach (var col in hitColliders)
                 {
-                    if (col.tag == "Player" && col.GetComponent<RPGActor>().IsLeader)
+                    if (col.tag == "Player")
                     {
                         Debug.Log("Player found");
                         foundActors.Add(col.gameObject);
