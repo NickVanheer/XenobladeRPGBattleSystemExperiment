@@ -5,12 +5,7 @@ using UnityEngine;
 public class TargetPlayerInRange : MonoBehaviour {
 
     public float Range = 150;
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
+
 	void Update () {
 
         if (GameManager.Instance.IsGameOver)

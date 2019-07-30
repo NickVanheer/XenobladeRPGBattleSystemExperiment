@@ -7,15 +7,18 @@ public class KeepDistanceFromOtherPlayers : MonoBehaviour {
     // Use this for initialization
     public float Speed = 10f;
     public float Distance = 10;
+    public float DistanceWhenEngaged = 40;
     //public bool IsMoving = false;
 
 	void Update () {
 
         //Can't keep distance when we're dead.
         if (this.gameObject.GetComponent<RPGActor>().State == ActorState.Dead)
-            return; 
+            return;
 
-        Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, Distance);
+        float dist = GetComponent<RPGActor>().State == ActorState.Engaged ? DistanceWhenEngaged : Distance;
+
+        Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, dist);
 
         if (hitColliders.Length > 0)
         {

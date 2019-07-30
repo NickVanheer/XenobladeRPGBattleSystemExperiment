@@ -24,6 +24,7 @@ public class ModalMessageBox : NovaUIElement {
 
     //
     public GameObject DialogOptionsHolder; //the container to instantiate them in
+    public GameObject DialogueWindow; //The overlapping window that should be animated
     public Color HighlightColor = Color.yellow;
     private List<GameObject> dialogOptionObjects; //the in-code instantiated text objects
     private List<UnityAction> dialogOptionActions; //the actions related to the in-code instantiated text objects
@@ -76,8 +77,8 @@ public class ModalMessageBox : NovaUIElement {
         Text t = gO.AddComponent<Text>();
         t.text = text;
         t.font = CoreUIManager.Instance.GameFont;
-        t.fontSize = 20;
-        t.resizeTextForBestFit = true;
+        t.fontSize = 33;
+        //t.resizeTextForBestFit = true;
 
         gO.transform.SetParent(DialogOptionsHolder.transform);
         gO.transform.localScale = new Vector3(1, 1, 1);
@@ -128,11 +129,17 @@ public class ModalMessageBox : NovaUIElement {
         foreach (var item in dialogOptionObjects)
         {
             item.SetActive(true);
-
         }
 
         isSelectingOption = true;
         selectedIndex = 0;
+
+        //We make this slightly larger 
+        if (DialogueWindow != null)
+        {
+            int increase = dialogOptionObjects.Count * 30;
+            DialogueWindow.GetComponent<RectTransform>().sizeDelta = new Vector2(DialogueWindow.GetComponent<RectTransform>().sizeDelta.x, DialogueWindow.GetComponent<RectTransform>().sizeDelta.y + increase);
+        }
     }
     #endregion
 
@@ -221,7 +228,13 @@ public class ModalMessageBox : NovaUIElement {
     public void Show(string txt, bool pauseGame = false)
     {
         base.Show(pauseGame);
-        
+
+        if(DialogueWindow != null)
+        {
+            Animator anim = DialogueWindow.GetComponent<Animator>();
+            anim.Play("ModalPanelAnimation");
+        }
+
         dialogueIndex = 0;
 
         var lines = txt.Split('\n');

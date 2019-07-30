@@ -509,12 +509,11 @@ public class GameManager : MonoBehaviour {
             return;
 
         Vector3 position = GetPartyLeader().transform.position + new Vector3(UnityEngine.Random.Range(-20, 20), 0, UnityEngine.Random.Range(-20, 20));
-        position.y = 4;
         GameObject member = Instantiate(GuestMemberPrefab, position, Quaternion.identity);
-        member.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
+        //member.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
 
         CurrentPartyMembers.Add(member);
-        CoreUIManager.Instance.AddPlayerBoxMini(member.GetComponent<RPGActor>());
+        CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
 
     }
 
@@ -536,7 +535,7 @@ public class GameManager : MonoBehaviour {
         };
         UnityAction noAction = () => { EventQueue.Instance.AddMessageBox("Okay :/", 1f); };
 
-        CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to upgrade your party?", yesAction, noAction);
+        CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to upgrade your party?" + "(" + PartyUpgradePrice + " gold)", yesAction, noAction);
     }
 
     public void BuyHealthUpgradePrompt()
