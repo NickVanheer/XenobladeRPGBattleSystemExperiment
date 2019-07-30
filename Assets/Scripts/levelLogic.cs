@@ -36,7 +36,6 @@ public class levelLogic : MonoBehaviour {
 
     public void Start()
     {
-        CoreUIManager.Instance.ShowQuickInfoPanel("Welcome");
         CurrentProgress = LevelProgress.Started;
 
         if(IsStartAtSpawnPoint2)
@@ -106,8 +105,11 @@ public class levelLogic : MonoBehaviour {
         {
             BossObject = GameObject.Instantiate(BossPrefab, BossSpawnPoint.transform.position, Quaternion.identity);
             BossObject.GetComponent<RPGActor>().Properties.ChangeLevel(BossLevel);
+            BossObject.GetComponent<RPGActor>().Properties.Name = LocalizationManager.Instance.GetLocalizedValue("BossName");
 
             EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(BossObject); });
+            EventQueue.Instance.WaitABit(2);
+            EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("letsbegin"),1.4f);
         }
     }
 

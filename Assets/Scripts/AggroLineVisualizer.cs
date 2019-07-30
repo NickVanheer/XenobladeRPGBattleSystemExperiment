@@ -29,15 +29,16 @@ public class AggroLineVisualizer : Track {
             line = transform.GetComponentInParent<LineRenderer>();
         if (line == null)
             line = this.gameObject.AddComponent<LineRenderer>();
-    }
-
-    void Update () {
 
         actor = GetComponent<RPGActor>();
         if (actor == null)
             actor = transform.GetComponentInParent<RPGActor>();
 
         Assert.IsNotNull(actor, "No RPGActor component could be found");
+    }
+
+    void Update ()
+    {
         if (actor.State == ActorState.Engaged && !actor.IsLeader) //don't show aggro line from leader to enemy, only from enemy to leader. Otherwise there are two aggro lines.
         {
             line.enabled = true;
@@ -59,12 +60,10 @@ public class AggroLineVisualizer : Track {
                 line.endColor = TargettingColor;
                 SetupAggroBezier(line, actor.SoftTargetObject.transform.position);
             }
-            else
-            {
-                line.enabled = false;
-            }
         }
-		
+
+        if (actor.State != ActorState.Engaged)
+            line.enabled = false;
 	}
 
     public override void CalculateStartPoints()

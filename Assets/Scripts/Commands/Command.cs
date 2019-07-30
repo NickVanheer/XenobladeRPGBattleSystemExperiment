@@ -85,6 +85,7 @@ public class Command : MonoBehaviour
         Transform toppleIcon = transform.FindDeepChild("Topple");
 
         Transform selectionCircle = transform.FindDeepChild("SelectionCircle");
+        Transform disabledMarker = transform.FindDeepChild("DisabledMarker");
 
         if (data.IsEnabled && data.CanExecute())
             transform.FindDeepChild("SkillIcon").GetComponent<Image>().color = new Color(1, 1, 1, 1f);
@@ -108,6 +109,9 @@ public class Command : MonoBehaviour
 
         if (breakIcon == null && toppleIcon == null)
             return;
+
+        if (disabledMarker != null)
+            disabledMarker.gameObject.SetActive(!data.IsEnabled);
 
         breakIcon.gameObject.SetActive(data.IsInflictBreak);
         toppleIcon.gameObject.SetActive(data.IsInflictTopple);

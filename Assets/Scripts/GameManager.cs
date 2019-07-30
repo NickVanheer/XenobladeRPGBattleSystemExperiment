@@ -243,6 +243,8 @@ public class GameManager : MonoBehaviour {
 
     public UnityEvent OnLocalizationChanged;
 
+    public int ActiveAOEs = 0;
+
     void Awake()
     {
         if (instance == null)
@@ -457,6 +459,8 @@ public class GameManager : MonoBehaviour {
         AoE.GetComponent<AoEAttack>().Instigator = instigator;
         AoE.GetComponent<AoEAttack>().PreviewDuration = duration;
         AoE.GetComponent<AoEAttack>().Damage = damage;
+
+        ActiveAOEs++;
     }
 
     public void SpawnTwoRectangleAoE(GameObject instigator, Vector3 position, int damage, float duration = 3f)
@@ -469,6 +473,8 @@ public class GameManager : MonoBehaviour {
         AoE.GetComponent<AoEAttack>().Instigator = instigator;
         AoE.GetComponent<AoEAttack>().PreviewDuration = duration;
         AoE.GetComponent<AoEAttack>().Damage = damage;
+
+        ActiveAOEs++;
     }
 
     public void SpawnAoE(GameObject instigator, Vector3 position, int damage, float scale, float duration = 3f)
@@ -481,6 +487,8 @@ public class GameManager : MonoBehaviour {
         AoE.GetComponent<AoEAttack>().PreviewDuration = duration;
         AoE.GetComponent<AoEAttack>().Scale(scale);
         AoE.GetComponent<AoEAttack>().Damage = damage;
+
+        ActiveAOEs++;
     }
 
     public void ChangeState(GameState newState)
@@ -525,17 +533,17 @@ public class GameManager : MonoBehaviour {
             {
                 Gold -= PartyUpgradePrice;
                 SpawnGuestMember();
-                EventQueue.Instance.AddMessageBox("Party upgraded!", 1f);
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("PartyUpgraded"), 1f);
             }
             else
             {
-                EventQueue.Instance.AddMessageBox("You don't have enough money to buy this.", 1f);
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("NotEnoughMoney"), 1f);
             }
 
         };
-        UnityAction noAction = () => { EventQueue.Instance.AddMessageBox("Okay :/", 1f); };
+        UnityAction noAction = () => { EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("Kaomoji"), 1f); };
 
-        CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to upgrade your party?" + "(" + PartyUpgradePrice + " gold)", yesAction, noAction);
+        CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", yesAction, noAction);
     }
 
     public void BuyHealthUpgradePrompt()

@@ -10,7 +10,11 @@ public class KeepDistanceFromOtherPlayers : MonoBehaviour {
     public float DistanceWhenEngaged = 40;
     //public bool IsMoving = false;
 
+    private Vector3 offset = Vector3.zero;
+
 	void Update () {
+
+        offset = Vector3.zero;
 
         //Can't keep distance when we're dead.
         if (this.gameObject.GetComponent<RPGActor>().State == ActorState.Dead)
@@ -37,12 +41,21 @@ public class KeepDistanceFromOtherPlayers : MonoBehaviour {
 
             if(closeObject != null)
             {
-                var dir = transform.position - closeObject.transform.position;
+                var directionVector = transform.position - closeObject.transform.position;
+
+                var distance = directionVector.magnitude;
+                var direction = directionVector / distance; // This is now the normalized direction.
                 //dir.y = 0;
                 //this.transform.Translate(dir.normalized * Time.deltaTime * Speed, Space.World);
-                GetComponent<CharacterController>().Move(dir.normalized * Time.deltaTime * Speed);
+                //GetComponent<CharacterController>().Move(direction * Time.deltaTime * Speed);
+
+                offset += direction;
             }
         }
+    }
 
+    private void LateUpdate()
+    {
+        GetComponent<CharacterController>().Move(offset * Time.deltaTime * Speed);
     }
 }

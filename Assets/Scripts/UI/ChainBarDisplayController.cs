@@ -24,6 +24,8 @@ public class ChainBarDisplayController : MonoBehaviour {
     public Slider ChainGauge2;
     public Slider ChainGauge3;
 
+    public float Scaler = 0.3f;
+
     public void Awake()
     {
         if (instance == null)
@@ -32,6 +34,8 @@ public class ChainBarDisplayController : MonoBehaviour {
 
     public void AddToChainBar(float value)
     {
+        value = value * Scaler;
+
         if (ChainBarsReady == 0)
             ChainGauge1.value += value;
         else if (ChainBarsReady == 1)

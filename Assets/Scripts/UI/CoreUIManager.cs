@@ -49,6 +49,7 @@ public class CoreUIManager : MonoBehaviour {
     public GameObject SpecialDamageTextPrefab;
     public GameObject PlayerBoxPrefab;
     public GameObject PlayerBoxMiniPrefab;
+    public GameObject OverheadHealthBar;
 
     [Header("[GENERAL] Color Scheme")]
     public Color EnemyTakeDamageColor;
@@ -180,6 +181,20 @@ public class CoreUIManager : MonoBehaviour {
                 t.text = text;
             }
         }
+    }
+
+    public GameObject CreateOverheadHealthBar(GameObject target, bool isEnemy = false)
+    {
+        if (OverheadHealthBar == null)
+            return null;
+
+        GameObject gO = Instantiate<GameObject>(OverheadHealthBar);
+        gO.GetComponent<RectTransform>().SetParent(GetCurrentCanvas().transform, false);
+        gO.GetComponent<World3DUIObject>().Target = target.transform;
+        gO.GetComponent<SetUIText>().ActorData = target.GetComponent<RPGActor>();
+        gO.SetActive(true);
+
+        return gO;
     }
 
     public void ShowBigText(string text)

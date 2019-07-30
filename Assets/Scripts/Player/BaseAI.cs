@@ -14,6 +14,8 @@ public abstract class BaseAI : MonoBehaviour {
     private float currentAttackTimer;
     protected RPGActor actor;
 
+    private GameObject playerOverheadHealthbar;
+
     void Start () {
         actor = GetComponent<RPGActor>();
         CalculateAutoAttackDelayBasedOnSpeed();
@@ -24,8 +26,15 @@ public abstract class BaseAI : MonoBehaviour {
 
         if(actor.State == ActorState.Engaged && actor.TargetObject != null)
         {
+            //Only create the overhead healthbar when we're a player.
+            if (playerOverheadHealthbar == null && gameObject.tag == "Player")
+                playerOverheadHealthbar = CoreUIManager.Instance.CreateOverheadHealthBar(this.gameObject);
+
+            if(playerOverheadHealthbar != null)
+                playerOverheadHealthbar.gameObject.SetActive(true);
+
             //check if target died and if it has, assign the next target, (if there is none, disengage)
-            if(actor.TargetObject.GetComponent<RPGActor>().State == ActorState.Dead)
+            if (actor.TargetObject.GetComponent<RPGActor>().State == ActorState.Dead)
             {
                 foreach (var target in actor.EngagedEnemies)
                 {
@@ -72,8 +81,11 @@ public abstract class BaseAI : MonoBehaviour {
             }
         }
 
+        if(actor.State != ActorState.Engaged && playerOverheadHealthbar != null)
+            playerOverheadHealthbar.gameObject.SetActive(false);
+
         //Restore health at same interval as auto-attack tick when we're not in battle (so either when we're death or when we're idle
-        if(actor.State == ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
+        if (actor.State == ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
         {
             //Gradually restore our health
             currentAttackTimer -= Time.deltaTime;
@@ -92,13 +104,19 @@ public abstract class BaseAI : MonoBehaviour {
         PlayerMove moveControl = GetComponent<PlayerMove>();
 
         if (moveControl != null)
-            isMoving = GetComponent<PlayerMove>().IsMoving;
+            isMoving = moveControl.IsMoving;
 
         if (!isMoving)
         {
             //rotateTowardsTarget();
             float step = MoveSpeed * Time.deltaTime;
-            transform.Translate(this.transform.forward * MoveSpeed * Time.deltaTime, Space.World);
+
+            CharacterController controller = GetComponent<CharacterController>();
+
+            if(controller != null)
+                controller.Move(transform.forward * Time.deltaTime * MoveSpeed);
+            else
+                transform.Translate(this.transform.forward * MoveSpeed * Time.deltaTime, Space.World);
         }
     }
 

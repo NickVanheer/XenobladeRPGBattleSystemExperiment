@@ -50,11 +50,12 @@ public class AoEAttack : MonoBehaviour {
             CheckIntersect();
             foreach (var actor in foundActors)
             {
-                Instigator.GetComponent<RPGActor>().DoDamageAttack(Damage, actor, 3f);
+                Instigator.GetComponent<RPGActor>().DoDamageAttack(Damage, MagicElemancy.Fire, actor, 3f);
                 CoreUIManager.Instance.SpawnLabel("AoE", actor, true);
             }
            
             GameObject.Destroy(this.gameObject);
+            GameManager.Instance.ActiveAOEs--;
         }
         else
         {

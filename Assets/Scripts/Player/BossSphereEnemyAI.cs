@@ -32,7 +32,7 @@ public class BossSphereEnemyAI : BaseAI {
             return;
         }
 
-        int skillDamage = Random.Range(3, 6);
+        int skillDamage = Random.Range(9, 14);
         actor.DoDamageAttackOnCurrentTarget(skillDamage);
     }
 
