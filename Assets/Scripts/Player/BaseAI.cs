@@ -96,8 +96,8 @@ public abstract class BaseAI : MonoBehaviour {
         if(actor.State != ActorState.Engaged && playerOverheadHealthbar != null)
             playerOverheadHealthbar.gameObject.SetActive(false);
 
-        //Restore health at same interval as auto-attack tick when we're not in battle (so when we're idle
-        if (actor.State != ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
+        //Restore health at same interval as auto-attack tick when we're not in battle (so when we're idle)
+        if (actor.State == ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
         {
             //Gradually restore our health
             currentAttackTimer -= Time.deltaTime;

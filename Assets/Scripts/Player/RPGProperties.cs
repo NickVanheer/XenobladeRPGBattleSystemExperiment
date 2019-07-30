@@ -78,6 +78,9 @@ public class RPGProperties
 
     public bool InflictBreak()
     {
+        if (IsTopple)
+            return false;
+
         IsBreak = true;
         CurrentBreakDuration = BreakDuration;
 

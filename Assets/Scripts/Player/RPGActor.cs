@@ -234,7 +234,7 @@ public class RPGActor : MonoBehaviour {
         int index = Random.Range(0, EngagedEnemies.Count - 1);
         GameObject targetObject = EngagedEnemies[index];
 
-        DoDamageAttack(skillDamage, targetObject);
+        DoDamageAttack(skillDamage, MagicElemancy.None, targetObject, 10f, true);
     }
 
     public void DoDamageAttackWithLabel(int skillDamage, string labelText, bool isRedLabel = false)
@@ -249,14 +249,14 @@ public class RPGActor : MonoBehaviour {
     }
     public void DoDamageAttackOnCurrentTarget(int skillDamage, bool isSpecialDamage = false, float fontIncrement = 0)
     {
-        DoDamageAttack(skillDamage, TargetObject, fontIncrement);
+        DoDamageAttack(skillDamage, MagicElemancy.None, TargetObject, fontIncrement, isSpecialDamage);
     }
 
     public void DoDamageAttack(int damage, GameObject target, float fontIncrement = 0)
     {
         DoDamageAttack(damage, MagicElemancy.None, target, 0);
     }
-    public void DoDamageAttack(int damage, MagicElemancy element, GameObject target, float fontIncrement = 0)
+    public void DoDamageAttack(int damage, MagicElemancy element, GameObject target, float fontIncrement = 0, bool isSpecialDamage = false)
     {
         BaseAI aiBase = GetComponent<BaseAI>();
 
@@ -312,8 +312,11 @@ public class RPGActor : MonoBehaviour {
 
         Color playerDMG = CoreUIManager.Instance.PlayerTakeDamageColor;
         Color enemyDMG = CoreUIManager.Instance.EnemyTakeDamageColor;
+        Color specialDMG = CoreUIManager.Instance.SpecialDamageColor;
 
-        if (this.tag == "Enemy")
+        if(isSpecialDamage)
+            CoreUIManager.Instance.SpawnText(dmg.ToString(), target, specialDMG, 2.6f);
+        else if (this.tag == "Enemy")
             CoreUIManager.Instance.SpawnText(dmg.ToString(), target, playerDMG, fontIncrement);
         else
             CoreUIManager.Instance.SpawnText(dmg.ToString(), target, enemyDMG, fontIncrement);

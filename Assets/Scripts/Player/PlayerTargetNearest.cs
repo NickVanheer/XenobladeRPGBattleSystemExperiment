@@ -12,6 +12,11 @@ public class PlayerTargetNearest : MonoBehaviour {
 
 	void Update () {
 
+        //Todo: Add support to engage multiple enemies and show the X cross on the engage skill only for targetted enemies we are already engaged with. 
+        //For now: only manually engage one enemy at the same time with the targetter
+        if (GetComponent<RPGActor>().State == ActorState.Engaged)
+            return;
+
         //Disengage soft target when pressing escape.
         if (GetComponent<RPGActor>().State == ActorState.Idle)
         {

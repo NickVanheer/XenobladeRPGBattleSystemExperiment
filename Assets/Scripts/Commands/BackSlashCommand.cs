@@ -15,7 +15,7 @@ public class BackSlashCommand : Command
         {
             if (GetComponent<RPGActor>().IsBehindTarget())
             {
-                GetComponent<RPGActor>().DoDamageAttackOnCurrentTarget(18, true);
+                GetComponent<RPGActor>().DoDamageAttackOnCurrentTarget(18, true, 10);
                 CoreUIManager.Instance.SpawnLabel("Back attack!", GetComponent<RPGActor>().TargetObject);
                 ChainBarDisplayController.Instance.AddToChainBar(8);
             }

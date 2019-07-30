@@ -451,10 +451,24 @@ public class GameManager : MonoBehaviour {
     {
         if (PotionPickupPrefab == null)
             return;
-        Vector3 position = GetPartyLeader().transform.position + UnityEngine.Random.insideUnitSphere * 60;
+        Vector3 position = GetAvailableRandomPosition(60);
         position.y = GetPartyLeader().transform.position.y + 20;
         GameObject potion = Instantiate(PotionPickupPrefab, position, Quaternion.identity);
         //potion.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
+    }
+
+    public Vector3 GetAvailableRandomPosition(float range)
+    {
+        Vector3 tryPos = GetPartyLeader().transform.position + UnityEngine.Random.insideUnitSphere * range;
+        tryPos.y = GetPartyLeader().transform.position.y;
+
+        //raycast check
+        bool isHit = Physics.Raycast(tryPos, new Vector3(0, -1, 0), 5);
+
+        if (isHit)
+            return tryPos;
+        else
+            return GetAvailableRandomPosition(range - 4);
     }
 
     public void SpawnAoE(GameObject instigator, Vector3 position, int damage, float duration = 3f)

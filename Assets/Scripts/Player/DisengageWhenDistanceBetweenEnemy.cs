@@ -11,7 +11,7 @@ public class DisengageWhenDistanceBetweenEnemy : MonoBehaviour {
         {
             distance = GetComponent<RPGActor>().TargetObject.GetComponent<RPGActor>().DisengageDistance;
             float d = Mathf.Abs(Vector3.Distance(this.transform.position, GetComponent<RPGActor>().TargetObject.transform.position));
-            Debug.Log(d);
+
             if (d >= distance)
             {
                 GetComponent<RPGActor>().TargetObject.GetComponent<RPGActor>().DisengageAllEngagedEnemies();

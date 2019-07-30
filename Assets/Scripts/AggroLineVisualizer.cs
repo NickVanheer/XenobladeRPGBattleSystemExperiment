@@ -39,7 +39,8 @@ public class AggroLineVisualizer : Track {
 
     void Update ()
     {
-        if (actor.State == ActorState.Engaged && !actor.IsLeader) //don't show aggro line from leader to enemy, only from enemy to leader. Otherwise there are two aggro lines.
+        //For the enemies 
+        if (actor.tag == "Enemy" && actor.State == ActorState.Engaged) //don't show aggro line from leader to enemy, only from enemy to leader. Otherwise there are two aggro lines.
         {
             line.enabled = true;
             line.startColor = HasBeenTargettedColor;
@@ -52,18 +53,19 @@ public class AggroLineVisualizer : Track {
         }
         else
         {
-            //Usually only the player units.
-            if (actor.State == ActorState.Idle && actor.SoftTargetObject != null)
-            {
-                line.enabled = true;
-                line.startColor = TargettingColor;
-                line.endColor = TargettingColor;
-                SetupAggroBezier(line, actor.SoftTargetObject.transform.position);
-            }
-        }
-
-        if (actor.State != ActorState.Engaged)
             line.enabled = false;
+        }
+      
+        //For the players
+        if (actor.tag == "Player" && actor.State == ActorState.Idle && actor.SoftTargetObject != null)
+        {
+            line.enabled = true;
+            line.startColor = TargettingColor;
+            line.endColor = TargettingColor;
+
+            line.material.color = TargettingColor;
+            SetupAggroBezier(line, actor.SoftTargetObject.transform.position);
+        }
 	}
 
     public override void CalculateStartPoints()
