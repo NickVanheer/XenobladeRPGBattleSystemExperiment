@@ -111,6 +111,14 @@ public class BattleState : GameState
 
     public override void StateExit()
     {
+        //Revive any dead party members
+        foreach (var unit in gameManager.CurrentPartyMembers)
+        {
+            RPGActor actor = unit.GetComponent<RPGActor>();
+            if (actor.Properties.CurrentHealth == 0)
+                actor.RestoreHP(20, true);
+            //Potentially check against the state of the unit (i.e: Dead) and clear status ailments,...
+        }
     }
 
     public override void StateUpdate()
@@ -212,7 +220,6 @@ public class GameManager : MonoBehaviour {
     public bool IsMouseCursorHidden = false;
     public bool IsDontDestroyBetweenScenes = false;
     public bool IsPausedForUI = false;
-    public string GameFlowChartPath = @"D:\Development\Unity\3D_RPGTester\Assets\tutorialLevelLogic.xml";
 
     //States
     [HideInInspector]
@@ -574,10 +581,11 @@ public class GameManager : MonoBehaviour {
     {
         UnityAction yesAction = () =>
         {
-            SceneManager.LoadScene(1);
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.name);
 
         };
-        UnityAction noAction = () => { SceneManager.LoadScene(0); };
+        UnityAction noAction = () => { EndGame(); };
 
         CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to reload the level and try again?", yesAction, noAction);
     }

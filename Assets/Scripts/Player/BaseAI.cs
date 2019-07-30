@@ -8,13 +8,16 @@ public abstract class BaseAI : MonoBehaviour {
     public float AttackTimer = 2;
     public float MoveSpeed = 10;
     public float StartAttackTimer = 0;
-    public float DistanceToTarget;
     public bool CanFollowTarget = false;
 
     private float currentAttackTimer;
     protected RPGActor actor;
 
+    public float ClosestEngageDistance = 10;
+    public float FarthestEngageDistance = 30;
+
     private GameObject playerOverheadHealthbar;
+    private Vector3 moveOffset = Vector3.zero;
 
     void Start () {
         actor = GetComponent<RPGActor>();
@@ -24,6 +27,7 @@ public abstract class BaseAI : MonoBehaviour {
 	
 	public virtual void Update () {
 
+        moveOffset = Vector3.zero;
         if(actor.State == ActorState.Engaged && actor.TargetObject != null)
         {
             //Only create the overhead healthbar when we're a player.
@@ -58,11 +62,15 @@ public abstract class BaseAI : MonoBehaviour {
 
             UpdateLoop();
 
-            //Auto-attack
-            float distance = Vector3.Distance(this.transform.position, actor.TargetObject.transform.position);
-            if (Mathf.Abs(distance) < 25 && Mathf.Abs(distance) > 1)
+            //
+            var heading = actor.TargetObject.transform.position - this.transform.position;
+            var distance = heading.magnitude;
+            var direction = heading / distance; // This is now the normalized direction.
+
+            if (Mathf.Abs(distance) <= FarthestEngageDistance && Mathf.Abs(distance) >= ClosestEngageDistance)
             {
                 currentAttackTimer -= Time.deltaTime;
+                moveOffset = Vector3.zero;
 
                 if (currentAttackTimer <= 0)
                 {
@@ -76,16 +84,20 @@ public abstract class BaseAI : MonoBehaviour {
             else
             {
                 //We haven't made contact yet, move closer to target. Or we're marked to always follow the target
-                if(CanFollowTarget)
-                    moveCloserToTarget();
+                //Move back
+                if (Mathf.Abs(distance) < ClosestEngageDistance)
+                    direction = direction * -1;
+
+                direction.y = 0;
+                moveOffset = direction;
             }
         }
 
         if(actor.State != ActorState.Engaged && playerOverheadHealthbar != null)
             playerOverheadHealthbar.gameObject.SetActive(false);
 
-        //Restore health at same interval as auto-attack tick when we're not in battle (so either when we're death or when we're idle
-        if (actor.State == ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
+        //Restore health at same interval as auto-attack tick when we're not in battle (so when we're idle
+        if (actor.State != ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
         {
             //Gradually restore our health
             currentAttackTimer -= Time.deltaTime;
@@ -98,7 +110,13 @@ public abstract class BaseAI : MonoBehaviour {
         }
 	}
 
-    private void moveCloserToTarget()
+    public void LateUpdate()
+    {
+        if (CanFollowTarget)
+            moveCloserToTarget(moveOffset);
+    }
+
+    private void moveCloserToTarget(Vector3 directionVector)
     {
         bool isMoving = false;
         PlayerMove moveControl = GetComponent<PlayerMove>();
@@ -108,15 +126,12 @@ public abstract class BaseAI : MonoBehaviour {
 
         if (!isMoving)
         {
-            //rotateTowardsTarget();
-            float step = MoveSpeed * Time.deltaTime;
-
             CharacterController controller = GetComponent<CharacterController>();
 
             if(controller != null)
-                controller.Move(transform.forward * Time.deltaTime * MoveSpeed);
+                controller.Move(directionVector * MoveSpeed * Time.deltaTime);
             else
-                transform.Translate(this.transform.forward * MoveSpeed * Time.deltaTime, Space.World);
+                transform.Translate(directionVector * MoveSpeed * Time.deltaTime, Space.World);
         }
     }
 

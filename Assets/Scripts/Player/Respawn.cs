@@ -22,7 +22,7 @@ public class Respawn : MonoBehaviour {
         Vector3 offset = Vector3.zero;
         foreach (var pMember in GameManager.Instance.CurrentPartyMembers)
         {
-            pMember.GetComponent<RPGActor>().DisengageAllEngagedEnemies();
+            pMember.GetComponent<RPGActor>().DisengageAllEngagedEnemies(true);
             pMember.transform.position = targetSpawnPoint.transform.position + offset;
             offset += new Vector3(5, 0, 5);
         }

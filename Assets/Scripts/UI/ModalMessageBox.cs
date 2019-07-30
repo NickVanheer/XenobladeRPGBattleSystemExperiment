@@ -38,8 +38,6 @@ public class ModalMessageBox : NovaUIElement {
     //false: modal single message
     private int dialogueIndex = 0;
 
-    private static ModalMessageBox modalPanel;
-
     //
     private string textToShow = "";
     private int textCharacterIndex = 0;

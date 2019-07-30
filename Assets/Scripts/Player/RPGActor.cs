@@ -419,8 +419,16 @@ public class RPGActor : MonoBehaviour {
         GameManager.Instance.Log("Actor " + this.name + " enters Engaged state. Engaged enemies: " + EngagedEnemies.Count);
     }
 
-    public void DisengageAllEngagedEnemies()
+    public void DisengageAllEngagedEnemies(bool notifyEnemy = false)
     {
+        if(notifyEnemy)
+        {
+            foreach (var unit in EngagedEnemies)
+            {
+                unit.GetComponent<RPGActor>().DisengageAllEngagedEnemies();
+            }
+        }
+
         EngagedEnemies.Clear();
         EnterIdleState();
 
