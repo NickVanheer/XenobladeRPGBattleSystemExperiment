@@ -129,8 +129,8 @@ public class CoreUIManager : MonoBehaviour {
         msgBox.SetCloseEvent(callBack);
         msgBox.Initialize();
 
-        msgBox.AddDialogOption("Yes", yesAction);
-        msgBox.AddDialogOption("No", noAction);
+        msgBox.AddDialogOption(LocalizationManager.Instance.GetLocalizedValue("Yes"), yesAction);
+        msgBox.AddDialogOption(LocalizationManager.Instance.GetLocalizedValue("No"), noAction);
         msgBox.Show(text, true);
     }
 
