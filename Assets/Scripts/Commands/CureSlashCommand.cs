@@ -7,8 +7,8 @@ public class CureSlashCommand : Command {
     // Use this for initialization
     void Start () {
 
-        Name = LocalizationManager.Instance.GetLocalizedValue("skillCureslash_N");
-        Description = LocalizationManager.Instance.GetLocalizedValue("skillCureslash_D");
+        Name = GetName();
+        Description = GetDescription();
         Slot = 0;
        Cost = 1;
        Cooldown = 40;
@@ -22,5 +22,16 @@ public class CureSlashCommand : Command {
 
         ResetCommand();
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
+    }
+
+    //Get realtime localized value when needed.
+    public override string GetName()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillCureslash_N");
+    }
+
+    public override string GetDescription()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillCureslash_D");
     }
 }

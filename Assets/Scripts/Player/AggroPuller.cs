@@ -35,7 +35,7 @@ public class AggroPuller : MonoBehaviour {
 
             if (currentTimer <= 0)
             {
-                CoreUIManager.Instance.SpawnLabel("Aggro+", this.gameObject);
+                CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Aggro") + "↑", this.gameObject);
                 GetComponent<RPGActor>().Target.PullAggro(this.gameObject);
                 currentTimer = AggroTimer;
             }

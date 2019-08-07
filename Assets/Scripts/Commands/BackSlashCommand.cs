@@ -6,8 +6,8 @@ public class BackSlashCommand : Command
 {
 	void Start () {
 
-        Name = LocalizationManager.Instance.GetLocalizedValue("skillBackslash_N");
-        Description = LocalizationManager.Instance.GetLocalizedValue("skillBackslash_D");
+        Name = GetName();
+        Description = GetDescription();
         Slot = 3;
        Cooldown = 15;
        Illustration = "Skills/BackSlash";
@@ -16,7 +16,7 @@ public class BackSlashCommand : Command
             if (GetComponent<RPGActor>().IsBehindTarget())
             {
                 GetComponent<RPGActor>().DoDamageAttackOnCurrentTarget(18, true, 10);
-                CoreUIManager.Instance.SpawnLabel("Back attack!", GetComponent<RPGActor>().TargetObject);
+                CoreUIManager.Instance.SpawnLabel(GetName(), GetComponent<RPGActor>().TargetObject);
                 ChainBarDisplayController.Instance.AddToChainBar(8);
             }
             else
@@ -28,5 +28,15 @@ public class BackSlashCommand : Command
 
         ResetCommand();
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
+    }
+
+    public override string GetName()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillBackslash_N");
+    }
+
+    public override string GetDescription()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillBackslash_D");
     }
 }

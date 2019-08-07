@@ -320,6 +320,29 @@ public class CoreUIManager : MonoBehaviour {
         }
     }
 
+    public void SpawnLabel(string text, GameObject target, string IconPath, bool isRedLabel = false)
+    {
+        GameObject toInstantiate = TextLabelPrefab;
+
+        if (isRedLabel)
+            toInstantiate = RedTextLabelPrefab;
+
+        if (toInstantiate != null)
+        {
+            GameObject gO = Instantiate<GameObject>(toInstantiate);
+            gO.GetComponent<RectTransform>().SetParent(GetCurrentCanvas().transform);
+            gO.transform.FindDeepChild("TextLabel").GetComponent<Text>().text = text;
+            Image img = gO.transform.FindDeepChild("Icon").GetComponent<Image>();
+            img.sprite = Resources.Load<Sprite>(IconPath);
+            img.gameObject.SetActive(true);
+
+            Vector2 targetPos = Camera.main.WorldToScreenPoint(target.transform.position);
+            targetPos.x += Random.Range(-5, 5);
+            targetPos.y += Random.Range(-5, 5);
+            gO.transform.position = targetPos;
+        }
+    }
+
     public void SpawnText(string text, GameObject target, Color colorToUse, bool isSpecialText = false)
     {
         if (DamageTextPrefab != null)

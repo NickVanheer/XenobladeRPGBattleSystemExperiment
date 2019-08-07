@@ -214,7 +214,7 @@ public class RPGActor : MonoBehaviour {
     public void InflictBreakOnTarget()
     {
         Target.Properties.InflictBreak();
-        CoreUIManager.Instance.SpawnLabel("Break", TargetObject);
+        CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Break"), TargetObject, "Textures/Break_Icon");
     }
 
     //on target
@@ -223,7 +223,7 @@ public class RPGActor : MonoBehaviour {
         bool toppled = Target.Properties.InflictTopple();
 
         if(toppled)
-            CoreUIManager.Instance.SpawnLabel("Topple", TargetObject);
+            CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Topple"), TargetObject, "Textures/Topple_Icon");
     }
 
     public void DoDamageAttackOnRandomTarget(int skillDamage, bool isSpecialDamage = false)
@@ -533,7 +533,7 @@ public class RPGActor : MonoBehaviour {
     {
         if(defeatedEnemyActor != null)
         {
-            GameManager.BattleResults result = GameManager.Instance.CalculateBattleResults(defeatedEnemyActor.GetComponent<RPGActor>());
+            BattleResults result = GameManager.Instance.CalculateBattleResults(defeatedEnemyActor.GetComponent<RPGActor>());
             bool isLevelUp = false; 
             foreach (var unit in GameManager.Instance.CurrentPartyMembers)
             {

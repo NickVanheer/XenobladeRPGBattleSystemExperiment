@@ -27,7 +27,7 @@ public class BossSphereEnemyAI : BaseAI {
         if (actor.Properties.GetHealthPercentage() < 50 && !isSpecialUsed)
         {
             GameManager.Instance.SpawnAoE(this.gameObject, GetFloorPosition(), 60, 3f, 3.0f);
-            CoreUIManager.Instance.SpawnLabel("Blaze", actor.gameObject);
+            CoreUIManager.Instance.SpawnLabel("AoE", actor.gameObject);
             isSpecialUsed = true;
             return;
         }

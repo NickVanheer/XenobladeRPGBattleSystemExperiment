@@ -6,8 +6,8 @@ public class ToppleHealCommand : Command {
 
     // Use this for initialization
     void Start () {
-        Name = "Topple Heal";
-        Description = "Inflicts Topple on broken enemies and spawns a health potion.";
+        Name = GetName();
+        Description = GetDescription();
         Slot = 1;
         IsInflictTopple = true;
         Cooldown = 30;
@@ -23,4 +23,16 @@ public class ToppleHealCommand : Command {
         IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
 	}
+
+    //Get realtime localized value when needed.
+    public override string GetName()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillToppleHeal_N");
+    }
+
+    public override string GetDescription()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillToppleHeal_D");
+    }
 }
+

@@ -14,7 +14,6 @@ public class FollowPartyLeader : MonoBehaviour {
     public Vector3 Drag;
 
     public bool IsMoving { get; private set; }
-    Vector3 targetPos;
     
     void Start () {
         actor = GetComponent<RPGActor>();

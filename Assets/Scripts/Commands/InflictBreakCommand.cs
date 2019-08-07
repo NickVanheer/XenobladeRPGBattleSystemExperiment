@@ -6,7 +6,7 @@ public class InflictBreakCommand : Command {
 
     void Start () {
         Cooldown = 15;
-        Name = "Break Slash";
+        Name = LocalizationManager.Instance.GetLocalizedValue("skillInflictBreak_N");
         ActionVariable += () =>
         {
             RPGActor leader = GameManager.Instance.CurrentPartyMembers[0].GetComponent<RPGActor>();

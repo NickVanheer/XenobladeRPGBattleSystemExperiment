@@ -11,6 +11,13 @@ using UnityEngine.Events;
 /// GameManager which holds global data and which won't be destroyed between scenes (by default), has a number of public functions which can be called from other classes and as callbacks set in the inspector (see DestroyOnTrigger for example)
 /// </summary>
 /// 
+
+public struct BattleResults
+{
+    public int Gold;
+    public int Experience;
+}
+
 public class GameStartState : GameState
 {
     public GameStartState(GameManager m) : base(m)
@@ -196,6 +203,7 @@ public class GameOverState : GameState
 }
 
 public enum DisplayLanguage { English, Japanese};
+public enum KeyboardLayout { Qwerty, Azerty};
 
 public class GameManager : MonoBehaviour {
 
@@ -247,6 +255,8 @@ public class GameManager : MonoBehaviour {
 
     public DisplayLanguage GameLanguage;
     public string LocalizationFileName;
+    public KeyboardLayout KeyLayout;
+    public bool IsDebugUseAzerty = false;
 
     public UnityEvent OnLocalizationChanged;
 
@@ -265,6 +275,16 @@ public class GameManager : MonoBehaviour {
 
             LocalizationManager.Instance.LoadLocalizedText(LocalizationFileName);
             Debug.Log("GameManager and localization info initialized");
+
+            KeyLayout = KeyboardLayout.Azerty;
+
+            if (IsDebugUseAzerty)
+                return;
+
+            if (Application.systemLanguage == SystemLanguage.Japanese || Application.systemLanguage == SystemLanguage.English)
+            {
+                KeyLayout = KeyboardLayout.Qwerty;
+            }
         }
     }
 
@@ -297,18 +317,10 @@ public class GameManager : MonoBehaviour {
     public void Update()
     {
         CurrentStateString = CurrentState.ToString();
-        if (Input.GetKeyDown(KeyCode.T))
-            SpawnHealthPotion();
 
         //update game state (either idle, or battle)
         if (CurrentState != null)
             CurrentState.StateUpdate();
-    }
-
-    public struct BattleResults
-    {
-        public int Gold;
-        public int Experience;
     }
 
     public BattleResults CalculateBattleResults(RPGActor defeatedEnemy)
@@ -539,7 +551,6 @@ public class GameManager : MonoBehaviour {
 
         Vector3 position = GetPartyLeader().transform.position + new Vector3(UnityEngine.Random.Range(-20, 20), 0, UnityEngine.Random.Range(-20, 20));
         GameObject member = Instantiate(GuestMemberPrefab, position, Quaternion.identity);
-        //member.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
 
         CurrentPartyMembers.Add(member);
         CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());

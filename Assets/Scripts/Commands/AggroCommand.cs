@@ -4,21 +4,16 @@ using UnityEngine;
 
 public class AggroCommand : Command {
 
-    public AggroCommand()
-    {
-    }
-
-    // Use this for initialization
     void Start () {
         Cooldown = 25;
-        Name = "Aggro Slash";
+        Name = GetName();
         ActionVariable += () =>
         {
             RPGActor leader = GameManager.Instance.CurrentPartyMembers[0].GetComponent<RPGActor>();
 
             if (leader != null && leader.State == ActorState.Engaged)
             {
-                CoreUIManager.Instance.SpawnLabel(Name, this.gameObject);
+                CoreUIManager.Instance.SpawnLabel(GetName(), this.gameObject);
                 GetComponent<RPGActor>().Target.PullAggro(this.gameObject);
             }
         };
@@ -32,5 +27,11 @@ public class AggroCommand : Command {
         base.ResetCommand();
         StartCooldown = 10;
         CurrentCooldown = 10;
+    }
+
+    //Get realtime localized value when needed.
+    public override string GetName()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillAggroPull_N");
     }
 }

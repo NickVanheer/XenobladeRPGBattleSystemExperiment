@@ -50,17 +50,12 @@ public class PlayerMove : MonoBehaviour {
             velocity.y = 0f;
 
         //Movement
-        //Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         Vector3 keyMove = Vector3.zero;
 
-        if (Input.GetKey(KeyCode.Q))
-            keyMove.x = -1;
-        if (Input.GetKey(KeyCode.D))
-            keyMove.x = 1;
-        if (Input.GetKey(KeyCode.S))
-            keyMove.z = -1;
-        if (Input.GetKey(KeyCode.Z))
-            keyMove.z = 1;
+        if (GameManager.Instance.KeyLayout == KeyboardLayout.Azerty)
+            HandleInputAzerty(ref keyMove);
+        else
+            HandleInputQuerty(ref keyMove);
 
         controller.Move(keyMove * Time.deltaTime * MoveSpeed);
 
@@ -102,16 +97,30 @@ public class PlayerMove : MonoBehaviour {
 
         //LeftStickInput();
         //RightStickInput();
+    }
 
-        /*
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            GetComponent<Rigidbody>().AddForce(this.transform.up * 1400, ForceMode.Force);
-        }
-        */
+    public void HandleInputAzerty(ref Vector3 keyMove)
+    {
+        if (Input.GetKey(KeyCode.Q))
+            keyMove.x = -1;
+        if (Input.GetKey(KeyCode.D))
+            keyMove.x = 1;
+        if (Input.GetKey(KeyCode.S))
+            keyMove.z = -1;
+        if (Input.GetKey(KeyCode.Z))
+            keyMove.z = 1;
+    }
 
-        //if (rotateDirection != Vector3.zero && IsMoving)
-        //  transform.rotation = Quaternion.LookRotation(rotateDirection);
+    public void HandleInputQuerty(ref Vector3 keyMove)
+    {
+        if (Input.GetKey(KeyCode.A))
+            keyMove.x = -1;
+        if (Input.GetKey(KeyCode.D))
+            keyMove.x = 1;
+        if (Input.GetKey(KeyCode.S))
+            keyMove.z = -1;
+        if (Input.GetKey(KeyCode.W))
+            keyMove.z = 1;
     }
 
     void RightStickInput()
