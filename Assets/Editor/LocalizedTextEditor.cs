@@ -21,6 +21,8 @@ public class LocalizedTextEditor : EditorWindow
 
     float sideMargins = 10;
     bool hasFile = false;
+    bool isEditing = false;
+    string keyToEdit;
 
     [MenuItem("Window/Localization Editor")]
     static void Init()
@@ -74,9 +76,13 @@ public class LocalizedTextEditor : EditorWindow
 
         if (LocalizationData != null)
         {
-            EditorGUI.HelpBox(new Rect(20, 35, 400, 40), "Now editing: " + filename, MessageType.Info);
+            EditorGUI.HelpBox(new Rect(20, 35, 350, 40), "Now editing: " + filename, MessageType.Info);
            
-            key = EditorGUILayout.TextField("Key: ", key);
+            if(isEditing)
+                EditorGUILayout.LabelField("Editing key: " + key, EditorStyles.boldLabel);
+            else
+                key = EditorGUILayout.TextField("Key: ", key);
+
             GUILayout.Label("English");
             english = EditorGUILayout.TextArea(english, GUILayout.Height(40));
             GUILayout.Label("Japanese");
@@ -90,9 +96,24 @@ public class LocalizedTextEditor : EditorWindow
                     japanese = japanese.Substring(0, maxTextCount);
             }
 
+            string labelName = isEditing ? "Edit" : "Add";
             //
-            if (GUILayout.Button("Add", GUILayout.Height(30)))
+            if (GUILayout.Button(labelName, GUILayout.Height(30)))
             {
+                if(isEditing)
+                {
+                    foreach (var item in LocalizationData.Items)
+                    {
+                        if(item.Key == keyToEdit)
+                        {
+                            item.ValueJapanese = japanese;
+                            item.ValueEnglish = english;
+                        }
+                    }
+                    isEditing = false;
+                    return;
+                }
+
                 bool exists = false;
                 foreach (var item in LocalizationData.Items)
                 {
@@ -107,14 +128,6 @@ public class LocalizedTextEditor : EditorWindow
                     newItem.ValueJapanese = japanese;
                     newItem.ValueEnglish = english;
                     LocalizationData.Items.Add(newItem);
-
-                    /*
-                    List<LocalizationItem> temp = new List<LocalizationItem>();
-                    foreach (var item in LocalizationData.items)
-                        temp.Add(item);
-                    temp.Add(newItem);
-                    LocalizationData.items = temp.ToArray();
-                    */
                 }
                 else
                 {
@@ -133,7 +146,7 @@ public class LocalizedTextEditor : EditorWindow
             GUILayout.EndScrollView();
         }
 
-        GUILayout.BeginHorizontal(GUILayout.Height(30));
+        GUILayout.BeginHorizontal(GUILayout.Height(20));
         GUILayout.Space(sideMargins);
 
         if (GUILayout.Button("Save Current"))
@@ -148,6 +161,50 @@ public class LocalizedTextEditor : EditorWindow
         GUILayout.Space(sideMargins);
         GUILayout.EndHorizontal();
 
+        //Edit
+        GUILayout.BeginHorizontal(GUILayout.Height(30));
+        GUILayout.Space(sideMargins);
+
+        if (GUILayout.Button("Edit entry"))
+        {
+            LocalizedEditWindow window = (LocalizedEditWindow)EditorWindow.GetWindow(typeof(LocalizedEditWindow), true, "Localization Keys");
+
+            List<string> keys = new List<string>();
+            foreach (var item in LocalizationData.Items)
+            {
+                keys.Add(item.Key);
+            }
+
+            window.AddKeys(keys);
+            window.OnEdit = new UnityEngine.Events.UnityEvent();
+            window.OnEdit.AddListener(() => 
+            {
+                keyToEdit = window.KeyToEdit;
+                EditorUtility.DisplayDialog("Confirm", "Now editing: " + keyToEdit, "Ok");
+                isEditing = true;
+
+                foreach (var item in LocalizationData.Items)
+                {
+                    if (item.Key == keyToEdit)
+                    {
+                        key = item.Key;
+                        english = item.ValueEnglish;
+                        japanese = item.ValueJapanese;
+                    }
+                }
+
+                window.Close();
+                Repaint();
+            });
+        }
+
+        if (isEditing && GUILayout.Button("Stop editing"))
+        {
+            isEditing = false;
+            Repaint();
+        }
+        GUILayout.Space(sideMargins);
+        GUILayout.EndHorizontal();
     }
 
     private void LoadGameData()

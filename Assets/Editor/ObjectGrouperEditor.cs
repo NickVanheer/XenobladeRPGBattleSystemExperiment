@@ -9,6 +9,9 @@ using UnityEngine;
 [CustomEditor(typeof(ObjectGrouper))]
 public class ObjectGrouperEditor : Editor
 {
+    string newGroupName = "";
+    string textToFind = "";
+
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -47,6 +50,39 @@ public class ObjectGrouperEditor : Editor
             foreach (var item in obj)
             {
                 if (item.gameObject.name.Contains("FloorCube") || item.gameObject.name.Contains("Wall"))
+                    item.transform.SetParent(parent.transform);
+            }
+        }
+
+        GUILayout.Space(5);
+        if (GUILayout.Button("Group Interactables", GUILayout.Height(30)))
+        {
+            GameObject parent = new GameObject("Interactable");
+
+            GameObject[] obj = FindObjectsOfType<GameObject>();
+            foreach (var item in obj)
+            {
+                if (item.tag == "Interactable")
+                    item.transform.SetParent(parent.transform);
+            }
+        }
+
+        GUILayout.Space(5);
+        EditorGUILayout.LabelField("Custom group", EditorStyles.boldLabel);
+        newGroupName = EditorGUILayout.TextField("Group name: ", newGroupName);
+        textToFind = EditorGUILayout.TextField("GameObject name contains: ", textToFind);
+
+        if (GUILayout.Button("Group Custom", GUILayout.Height(30)))
+        {
+            if (newGroupName.Length == 0 || textToFind.Length == 0)
+                return;
+
+            GameObject parent = new GameObject(newGroupName);
+
+            GameObject[] obj = FindObjectsOfType<GameObject>();
+            foreach (var item in obj)
+            {
+                if (item.gameObject.name.Contains(textToFind))
                     item.transform.SetParent(parent.transform);
             }
         }
