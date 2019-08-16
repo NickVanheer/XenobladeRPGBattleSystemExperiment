@@ -65,24 +65,6 @@ public class IdleState : GameState
     }
 }
 
-public class BusyUIState : GameState
-{
-    public BusyUIState(GameManager m) : base(m)
-    { }
-
-    public override void StateEntry()
-    {
-    }
-
-    public override void StateExit()
-    {
-    }
-
-    public override void StateUpdate()
-    {
-    }
-}
-
 public class BattleState : GameState
 {
     public BattleState(GameManager m) : base(m)
@@ -578,30 +560,6 @@ public class GameManager : MonoBehaviour {
         CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", yesAction, noAction);
     }
 
-    public void BuyHealthUpgradePrompt()
-    {
-        UnityAction yesAction = () => 
-        {
-            if(Gold >= HealthUpgradePrice)
-            {
-                Gold -= HealthUpgradePrice;
-                foreach (var member in CurrentPartyMembers)
-                {
-                    member.GetComponent<RPGActor>().Properties.MaxHealth += 200;
-                }
-                EventQueue.Instance.AddMessageBox("Health upgraded!", 1f);
-            }
-            else
-            {
-                EventQueue.Instance.AddMessageBox("You don't have enough money to buy this.", 1f);
-            }
-
-        };
-        UnityAction noAction = () => { EventQueue.Instance.AddMessageBox("Okay :/", 1f); };
-
-        CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to upgrade your health?", yesAction, noAction);
-    }
-
     public void GameOverPrompt()
     {
         UnityAction yesAction = () =>
@@ -612,7 +570,7 @@ public class GameManager : MonoBehaviour {
         };
         UnityAction noAction = () => { EndGame(); };
 
-        CoreUIManager.Instance.ShowYesNoMessageBox("Do you want to reload the level and try again?", yesAction, noAction);
+        CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("GameOverMessage"), yesAction, noAction);
     }
 
     public void ChangeLanguage(DisplayLanguage language)

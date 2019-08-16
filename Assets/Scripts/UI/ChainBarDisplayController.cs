@@ -24,7 +24,7 @@ public class ChainBarDisplayController : MonoBehaviour {
     public Slider ChainGauge2;
     public Slider ChainGauge3;
 
-    public float Scaler = 0.3f;
+    public float Scaler = 0.6f;
 
     public void Awake()
     {

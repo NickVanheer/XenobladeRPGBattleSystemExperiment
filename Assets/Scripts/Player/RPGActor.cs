@@ -261,7 +261,7 @@ public class RPGActor : MonoBehaviour {
         BaseAI aiBase = GetComponent<BaseAI>();
 
         if (IsPlayer())
-            ChainBarDisplayController.Instance.AddToChainBar(1);
+            ChainBarDisplayController.Instance.AddToChainBar(1.5f);
 
         RPGActor targetActor = target.GetComponent<RPGActor>();
         TargetObject = target;
@@ -285,8 +285,8 @@ public class RPGActor : MonoBehaviour {
         var playerShoot = GetComponent<PlayerShoot>();
         if (playerShoot != null && target != null)
         {
-            playerShoot.TargetObject = target;
-            playerShoot.ShootBullet();
+            //playerShoot.TargetObject = target;
+            playerShoot.ShootBullet(target);
         }
 
         DamageInfo damageInfo = ResolveDamageUnitAGivesUnitB(this.Properties, targetActor.Properties, damage);

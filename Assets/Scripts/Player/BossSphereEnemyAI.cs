@@ -6,8 +6,10 @@ public class BossSphereEnemyAI : BaseAI {
 
     public int AoESize = 1;
     public int AoECooldown = 4;
+    public int GroupAttackCooldown = 9;
     bool isSpecialUsed = false;
     float aoeTimer;
+    float groupTimer;
 
     public override void DefaultAttack()
     {
@@ -39,10 +41,23 @@ public class BossSphereEnemyAI : BaseAI {
     public override void ResetOnEnterIdleState()
     {
         isSpecialUsed = false;
+        aoeTimer = 0f;
+        groupTimer = 0f;
     }
 
     public override void UpdateLoop()
     {
         aoeTimer += Time.deltaTime;
+        groupTimer += Time.deltaTime;
+
+        if (groupTimer > GroupAttackCooldown)
+        {
+            groupTimer = 0f;
+            foreach (var player in GameManager.Instance.CurrentPartyMembers)
+            {
+                actor.DoDamageAttack(6, player);
+            }
+        }
+
     }
 }

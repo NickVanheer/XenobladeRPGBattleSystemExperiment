@@ -8,8 +8,7 @@ public class PlayerShoot : MonoBehaviour {
     public Transform SpawnPosition;
     public float BulletSpeed = 60;
 
-
-    public void ShootBullet()
+    public void ShootBullet(GameObject target = null)
     {
         GameObject gO = Utils.InstantiateSafe(BulletPrefab, SpawnPosition.position);
         Bullet b = gO.GetComponent<Bullet>();
@@ -23,7 +22,16 @@ public class PlayerShoot : MonoBehaviour {
 
         gO.transform.parent = groupObject.transform;
 
-        var pointing = TargetObject.transform.position - this.transform.position;
+        if (target == null)
+            target = TargetObject; 
+
+        if(target == null)
+        {
+            Debug.LogError("No bullet target assigned for PlayerShoot on object " + gameObject.name);
+            return;
+        }
+
+        var pointing = target.transform.position - this.transform.position;
         var distance = pointing.magnitude;
         var direction = pointing / distance;
 

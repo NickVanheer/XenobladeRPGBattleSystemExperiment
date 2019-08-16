@@ -67,16 +67,16 @@ public class ModalMessageBox : NovaUIElement {
     public void AddDialogOption(string text, UnityAction action)
     {
         //GameObject gO = Instantiate(CommandLineToInstantiate) as GameObject;
-        //Manually create this so we might have more control when needed.
+        //--> Manually create this so we might have more control when needed.
         GameObject gO = new GameObject();
-        gO.AddComponent<RectTransform>();
+        RectTransform r = gO.AddComponent<RectTransform>();
+        r.sizeDelta = new Vector2(200, 65);
         gO.AddComponent<LayoutElement>();
 
         Text t = gO.AddComponent<Text>();
         t.text = text;
         t.font = CoreUIManager.Instance.GameFont;
         t.fontSize = 33;
-        //t.resizeTextForBestFit = true;
 
         gO.transform.SetParent(DialogOptionsHolder.transform);
         gO.transform.localScale = new Vector3(1, 1, 1);

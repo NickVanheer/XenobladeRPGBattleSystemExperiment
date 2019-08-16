@@ -128,6 +128,11 @@ public class LocalizedTextEditor : EditorWindow
                     newItem.ValueJapanese = japanese;
                     newItem.ValueEnglish = english;
                     LocalizationData.Items.Add(newItem);
+
+                    //reset values.
+                    key = "";
+                    japanese = "";
+                    english = "";
                 }
                 else
                 {

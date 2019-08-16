@@ -82,6 +82,10 @@ public class ObjectGrouperEditor : Editor
             GameObject[] obj = FindObjectsOfType<GameObject>();
             foreach (var item in obj)
             {
+                //Don't modify nested children.
+                if (item.transform.parent != null)
+                    continue;
+
                 if (item.gameObject.name.Contains(textToFind))
                     item.transform.SetParent(parent.transform);
             }
