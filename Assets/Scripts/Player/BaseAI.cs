@@ -19,45 +19,66 @@ public abstract class BaseAI : MonoBehaviour {
     private GameObject playerOverheadHealthbar;
     private Vector3 moveOffset = Vector3.zero;
 
+    private float updateDelay = 0.1f;
+
     void Start () {
         actor = GetComponent<RPGActor>();
         CalculateAutoAttackDelayBasedOnSpeed();
         currentAttackTimer = StartAttackTimer;
+
+        StartCoroutine(UpdateCoroutine());
     }
-	
-	public virtual void Update () {
 
-        moveOffset = Vector3.zero;
-        if(actor.State == ActorState.Engaged && actor.TargetObject != null)
+    //Happens every updateDelay seconds
+    IEnumerator UpdateCoroutine()
+    {
+        while (true)
         {
-            //Only create the overhead healthbar when we're a player.
-            if (playerOverheadHealthbar == null && gameObject.tag == "Player")
-                playerOverheadHealthbar = CoreUIManager.Instance.CreateOverheadHealthBar(this.gameObject);
-
-            if(playerOverheadHealthbar != null)
-                playerOverheadHealthbar.gameObject.SetActive(true);
-
-            //check if target died and if it has, assign the next target, (if there is none, disengage)
-            if (actor.TargetObject.GetComponent<RPGActor>().State == ActorState.Dead)
+            moveOffset = Vector3.zero;
+            if (actor.State == ActorState.Engaged && actor.TargetObject != null)
             {
-                foreach (var target in actor.EngagedEnemies)
+                //Only create the overhead healthbar when we're a player.
+                if (gameObject.tag == "Player" && playerOverheadHealthbar == null)
+                    playerOverheadHealthbar = CoreUIManager.Instance.CreateOverheadHealthBar(this.gameObject);
+
+                if (playerOverheadHealthbar != null)
+                    playerOverheadHealthbar.gameObject.SetActive(true);
+
+                //check if target died and if it has, assign the next target, (if there is none, disengage)
+                if (actor.TargetObject.GetComponent<RPGActor>().State == ActorState.Dead)
                 {
-                    if (target.GetComponent<RPGActor>().State == ActorState.Engaged)
+                    foreach (var target in actor.EngagedEnemies)
                     {
-                        this.GetComponent<RPGActor>().SetTarget(target);
-                        break;
+                        if (target.GetComponent<RPGActor>().State == ActorState.Engaged)
+                        {
+                            this.GetComponent<RPGActor>().SetTarget(target);
+                            break;
+                        }
                     }
                 }
+
+                //Don't do anything when we're Toppled.
+                if (actor.Properties.IsTopple)
+                    yield return new WaitForSeconds(updateDelay);
             }
 
-            //Don't do anything when we're Toppled.
-            if (actor.Properties.IsTopple)
-                return;
+            if (actor.State != ActorState.Engaged && playerOverheadHealthbar != null)
+                playerOverheadHealthbar.gameObject.SetActive(false);
 
+            //
+            yield return new WaitForSeconds(updateDelay);
+        }
+    }
+
+    //Happens every frame
+    public virtual void Update () {
+
+        if (actor.State == ActorState.Engaged && actor.TargetObject != null)
+        {
             //Rotate leader towards target when we're not moving ourselves
-            if(actor.IsLeader  && !GetComponent<PlayerMove>().IsMoving)
+            if (actor.IsLeader && !GetComponent<PlayerMove>().IsMoving)
                 rotateTowardsTarget();
-            else if(!GetComponent<RPGActor>().IsLeader) //rotate other party members and enemies to target too
+            else if (!GetComponent<RPGActor>().IsLeader) //rotate other party members and enemies to target too
                 rotateTowardsTarget();
 
             UpdateLoop();
@@ -93,9 +114,6 @@ public abstract class BaseAI : MonoBehaviour {
             }
         }
 
-        if(actor.State != ActorState.Engaged && playerOverheadHealthbar != null)
-            playerOverheadHealthbar.gameObject.SetActive(false);
-
         //Restore health at same interval as auto-attack tick when we're not in battle (so when we're idle)
         if (actor.State == ActorState.Idle && actor.Properties.CurrentHealth != actor.Properties.MaxHealth)
         {
@@ -108,7 +126,8 @@ public abstract class BaseAI : MonoBehaviour {
                 currentAttackTimer = AttackTimer;
             }
         }
-	}
+
+    }
 
     public void LateUpdate()
     {

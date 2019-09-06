@@ -5,6 +5,17 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+/// <summary>
+/// Global structs and enums
+/// </summary>
+public enum DisplayLanguage { English, Japanese };
+public enum KeyboardLayout { Qwerty, Azerty };
+
+public struct BattleResults
+{
+    public int Gold;
+    public int Experience;
+}
 
 /// <summary>
 /// Simple State system, not used in HackingGame project
@@ -29,7 +40,9 @@ public abstract class GameState
     public abstract void StateExit();
 }
 
-
+/// <summary>
+/// Extensions
+/// </summary>
 public static class TransformDeepChildExtension
     {
         public static Transform FindDeepChild(this Transform aParent, string aName)
@@ -100,7 +113,6 @@ public static class ListExtensions
 
     public static class TransformExtensions
     {
-
         public static void SetX(this Transform transform, float x)
         {
             Vector3 newPosition =
@@ -151,20 +163,6 @@ class Utils
 
         GameObject result = (GameObject)GameObject.Instantiate(gO, position, Quaternion.identity);
         return result;
-    }
-
-    public static GameObject LoadGameObjectSafe(string filenameFromResources)
-    {
-        GameObject GO = Resources.Load<GameObject>(filenameFromResources.Trim());
-
-        if (GO == null)
-        {
-            //report error better
-            UnityEngine.Debug.LogError("Can't load GameObject " + filenameFromResources);
-            UnityEngine.Debug.Break();
-        }
-
-        return GO;
     }
 }
 

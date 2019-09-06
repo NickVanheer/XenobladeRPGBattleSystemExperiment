@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class StartupManager : MonoBehaviour
 {
-
-    // Use this for initialization
+    /*
+    // Use this for initialization -> Using Script Execution Order instead
     private IEnumerator Start()
     {
         Screen.SetResolution(800, 600, false);
@@ -17,5 +17,5 @@ public class StartupManager : MonoBehaviour
 
         SceneManager.LoadScene("GameScene");
     }
-
+    */
 }

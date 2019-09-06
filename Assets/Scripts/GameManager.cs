@@ -12,11 +12,7 @@ using UnityEngine.Events;
 /// </summary>
 /// 
 
-public struct BattleResults
-{
-    public int Gold;
-    public int Experience;
-}
+#region Game States
 
 public class GameStartState : GameState
 {
@@ -140,7 +136,6 @@ public class BattleState : GameState
             }
 
             QTETimer -= Time.deltaTime;
-
             if(QTETimer <= 0)
             {
                 QTERingController.Instance.ResetAndShowQTE();
@@ -183,9 +178,7 @@ public class GameOverState : GameState
         base.StateInitialize();
     }
 }
-
-public enum DisplayLanguage { English, Japanese};
-public enum KeyboardLayout { Qwerty, Azerty};
+#endregion
 
 public class GameManager : MonoBehaviour {
 
@@ -243,6 +236,7 @@ public class GameManager : MonoBehaviour {
     public UnityEvent OnLocalizationChanged;
 
     public int ActiveAOEs = 0;
+    public bool IsMainMenu = false;
 
     void Awake()
     {
@@ -290,6 +284,9 @@ public class GameManager : MonoBehaviour {
 
         ChangeState(StateGameStart);
 
+        if (IsMainMenu)
+            return;
+
         foreach (var member in CurrentPartyMembers)
         {
             CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
@@ -298,7 +295,7 @@ public class GameManager : MonoBehaviour {
 
     public void Update()
     {
-        CurrentStateString = CurrentState.ToString();
+        CurrentStateString = CurrentState.ToString(); //For debugging
 
         //update game state (either idle, or battle)
         if (CurrentState != null)
@@ -369,39 +366,6 @@ public class GameManager : MonoBehaviour {
     public GameObject GetPartyLeaderTarget()
     {
         return CurrentPartyMembers[0].GetComponent<RPGActor>().TargetObject;
-    }
-
-    public void LoadLevel(string name)
-    {
-        SceneManager.LoadScene(name.Trim());
-        SoundManager.Instance.PlayConfirmSound();
-
-        //reset global values
-        IsGameOver = false;
-    }
-
-    public void EndGame()
-    {
-        #if UNITY_EDITOR
-                Debug.Break();
-        #else
-         Application.Quit();
-        #endif
-    }
-
-    public void PauseGame()
-    {
-        IsPausedForUI = true;
-    }
-
-    public void UnpauseGame()
-    {
-        IsPausedForUI = false;
-    }
-
-    public void TogglePause()
-    {
-        IsPausedForUI = !IsPausedForUI;
     }
 
     public void EnterBattleState()
@@ -536,7 +500,6 @@ public class GameManager : MonoBehaviour {
 
         CurrentPartyMembers.Add(member);
         CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
-
     }
 
     public void BuyPartyUpgradePrompt()
@@ -580,6 +543,40 @@ public class GameManager : MonoBehaviour {
             OnLocalizationChanged.Invoke();
         EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("LanguageChanged"), 1);
 
+    }
+
+    /// Core
+    public void LoadLevel(string name)
+    {
+        SceneManager.LoadScene(name.Trim());
+        SoundManager.Instance.PlayConfirmSound();
+
+        //reset global values
+        IsGameOver = false;
+    }
+
+    public void EndGame()
+    {
+        #if UNITY_EDITOR
+                Debug.Break();
+        #else
+                 Application.Quit();
+        #endif  
+    }
+
+    public void PauseGame()
+    {
+        IsPausedForUI = true;
+    }
+
+    public void UnpauseGame()
+    {
+        IsPausedForUI = false;
+    }
+
+    public void TogglePause()
+    {
+        IsPausedForUI = !IsPausedForUI;
     }
 
     public void Log(string text)
