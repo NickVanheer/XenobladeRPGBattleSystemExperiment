@@ -13,7 +13,7 @@ public class levelLogic : MonoBehaviour {
     public int Phase1DestroyedCount = 0;
     public GameObject Phase1Door;
 
-    public int BossLevel = 3;
+    public int BossLevel = 5;
     public TextMesh BossLevelTextMesh; 
 
     public LevelProgress CurrentProgress { get; private set; }

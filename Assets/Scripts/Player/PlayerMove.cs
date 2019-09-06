@@ -57,6 +57,14 @@ public class PlayerMove : MonoBehaviour {
         else
             HandleInputQuerty(ref keyMove);
 
+        if(Input.GetMouseButton(0))
+        {
+            Vector3 mousePos = GetWorldPoint();
+            Vector3 dir = mousePos - this.transform.position;
+            dir.y = 0;
+            keyMove = dir.normalized;
+        }
+
         controller.Move(keyMove * Time.deltaTime * MoveSpeed);
 
         if (keyMove != Vector3.zero)
@@ -121,6 +129,16 @@ public class PlayerMove : MonoBehaviour {
             keyMove.z = -1;
         if (Input.GetKey(KeyCode.W))
             keyMove.z = 1;
+    }
+
+    Vector3 GetWorldPoint()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 5000f))
+            return hit.point;
+
+        return this.transform.position;
     }
 
     void RightStickInput()

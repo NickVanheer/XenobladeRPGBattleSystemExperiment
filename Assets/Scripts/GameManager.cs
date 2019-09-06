@@ -415,6 +415,15 @@ public class GameManager : MonoBehaviour {
         //potion.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
     }
 
+    public void SpawnHealthPotion(Vector3 pos)
+    {
+        if (PotionPickupPrefab == null)
+            return;
+        
+        GameObject potion = Instantiate(PotionPickupPrefab, pos, Quaternion.identity);
+        //potion.GetComponent<Rigidbody>().AddForce(new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f)) * PotionThrust, ForceMode.Impulse);
+    }
+
     public Vector3 GetAvailableRandomPosition(float range)
     {
         Vector3 tryPos = GetPartyLeader().transform.position + UnityEngine.Random.insideUnitSphere * range;
