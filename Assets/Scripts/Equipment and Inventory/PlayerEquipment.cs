@@ -5,12 +5,10 @@ using UnityEngine;
 public class PlayerEquipment : MonoBehaviour {
 
     public Weapon CurrentWeapon;
-	// Use this for initialization
 	void Start () {
 		
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		
 	}

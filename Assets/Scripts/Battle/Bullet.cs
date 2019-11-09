@@ -9,7 +9,6 @@ public class Bullet : MonoBehaviour {
     public bool IsImmortal = false;
     public Vector3 MoveDirection;
 
-	// Update is called once per frame
 	void Update () {
 
         if (IsMoving)

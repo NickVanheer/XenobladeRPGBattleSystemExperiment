@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Global structs and enums
@@ -38,6 +39,12 @@ public abstract class GameState
     public abstract void StateEntry();
     public abstract void StateUpdate();
     public abstract void StateExit();
+}
+
+public struct LocalizedMessageOption
+{
+    public UnityAction actionToPerform;
+    public string LocalizedValueTag;
 }
 
 /// <summary>

@@ -8,7 +8,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 
 /// <summary>
-/// GameManager which holds global data and which won't be destroyed between scenes (by default), has a number of public functions which can be called from other classes and as callbacks set in the inspector (see DestroyOnTrigger for example)
+/// GameManager which holds global data and which won't be destroyed between scenes (by default), 
+/// GameManager has a number of public variables and functions which can be called from other classes and as callbacks set in the inspector, as well as the game states.
+/// 
+/// Nick Vanheer
+/// nickvanheer.com
 /// </summary>
 /// 
 
@@ -58,6 +62,11 @@ public class IdleState : GameState
 
     public override void StateUpdate()
     {
+        //We don't have a soft target, show the pause/exit game message prompt.
+        if(Input.GetKeyDown(KeyCode.Escape) && !gameManager.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget)
+        {
+            gameManager.ExitGamePrompt();
+        }
     }
 }
 
@@ -308,6 +317,7 @@ public class GameManager : MonoBehaviour {
         BattleResults results = default(BattleResults);
         int expToAdd = defeatedEnemy.Properties.EarnedExperience;
         int goldToAdd = defeatedEnemy.Properties.EarnedGold;
+
         //add additional exp from passive bonusses, rest time, etc.
 
         results.Experience = expToAdd;
@@ -398,7 +408,7 @@ public class GameManager : MonoBehaviour {
         {
             foreach (var member in CurrentPartyMembers)
             {
-                //Can't restore party members that are already dead.
+                //Don't restore party members that are already dead.
                 if(member.GetComponent<RPGActor>().Properties.CurrentHealth > 0)
                     member.GetComponent<RPGActor>().RestoreHP(percentage, showDamageNumber);
             }
@@ -545,6 +555,20 @@ public class GameManager : MonoBehaviour {
         CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("GameOverMessage"), yesAction, noAction);
     }
 
+    public void ExitGamePrompt()
+    {
+        LocalizedMessageOption continueAction;
+        LocalizedMessageOption exitGame;
+
+        continueAction.LocalizedValueTag = "ContinueGame";
+        continueAction.actionToPerform = () => {  };
+
+        exitGame.LocalizedValueTag = "ExitGame";
+        exitGame.actionToPerform = () => { EndGame(); };
+
+        CoreUIManager.Instance.ShowMessageBoxWithOptions(LocalizationManager.Instance.GetLocalizedValue("IsExit"), continueAction, exitGame);
+    }
+
     public void ChangeLanguage(DisplayLanguage language)
     {
         this.GameLanguage = language;
@@ -554,7 +578,6 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    /// Core
     public void LoadLevel(string name)
     {
         SceneManager.LoadScene(name.Trim());

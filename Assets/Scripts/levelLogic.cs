@@ -18,8 +18,6 @@ public class levelLogic : MonoBehaviour {
 
     public LevelProgress CurrentProgress { get; private set; }
 
-    //public GameObject currentSpawnPoint;
-
     [Header("Spawnpoints")]
     public GameObject StartSpawnPoint;
     public GameObject PhaseTwoSpawnPoint;
@@ -45,14 +43,13 @@ public class levelLogic : MonoBehaviour {
     public void Update()
     {
         BossLevelTextMesh.text = BossLevel.ToString();
-        if (Phase1DestroyedCount >= 1)
+        if (CurrentProgress != LevelProgress.GatekeeperDefeated && Phase1DestroyedCount >= 1)
         {
             EventQueue.Instance.WaitABit(2f);
             EventQueue.Instance.AddAction(() => { Phase1Door.GetComponent<SmoothMoveToPosition>().enabled = true; });
             EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(Phase1Door); });
             EventQueue.Instance.WaitABit(3f);
             EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("SomethingChanged"), 2);
-            //CoreUIManager.Instance.ShowQuickInfoPanel("Something happened...");
 
             Phase1DestroyedCount = 0;
             CurrentProgress = LevelProgress.GatekeeperDefeated;
@@ -60,10 +57,12 @@ public class levelLogic : MonoBehaviour {
             //Play sound effect
         }
 
+        /*
         if(Input.GetKeyDown(KeyCode.P))
         {
             GameManager.Instance.SpawnHealthPotion();
         }
+        */
 
         if(CurrentProgress == LevelProgress.BossDefeated)
         {
@@ -89,11 +88,13 @@ public class levelLogic : MonoBehaviour {
     public void IncreaseBossLevel()
     {
         BossLevel++;
+        BossLevel = Mathf.Clamp(BossLevel, 1, 99);
     }
 
     public void DecreaseBossLevel()
     {
         BossLevel--;
+        BossLevel = Mathf.Clamp(BossLevel, 1, 99);
     }
 
     public void SpawnBoss()

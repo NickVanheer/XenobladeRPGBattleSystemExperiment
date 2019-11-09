@@ -35,7 +35,5 @@ public class FocusCamera : MonoBehaviour {
         GetComponent<PlayerCameraFollow>().enabled = false;
         IsFocussing = true;
         timer = Duration;
-
-
     }
 }

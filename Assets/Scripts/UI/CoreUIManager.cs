@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 /*************************** UIManager *********************************
 
-    CoreUIManager class contain core UI functions, shared between all scenes
+    CoreUIManager class contains core UI functions, shared between all scenes
 
 ************************************************************************/
 
@@ -131,6 +131,27 @@ public class CoreUIManager : MonoBehaviour {
 
         msgBox.AddDialogOption(LocalizationManager.Instance.GetLocalizedValue("Yes"), yesAction);
         msgBox.AddDialogOption(LocalizationManager.Instance.GetLocalizedValue("No"), noAction);
+        msgBox.Show(text, true);
+    }
+
+    public void ShowMessageBoxWithOptions(string text, params LocalizedMessageOption[] actions)
+    {
+        if (ModalPanel == null)
+            return;
+
+        //disableControl();
+        GameObject gO = Instantiate<GameObject>(ModalPanel);
+        gO.GetComponent<RectTransform>().SetParent(GetCurrentCanvas().transform, false);
+        ModalMessageBox msgBox = gO.GetComponent<ModalMessageBox>();
+
+        msgBox.SetCloseEvent(null);
+        msgBox.Initialize();
+
+        foreach (var action in actions)
+        {
+            msgBox.AddDialogOption(LocalizationManager.Instance.GetLocalizedValue(action.LocalizedValueTag), action.actionToPerform);
+        }
+
         msgBox.Show(text, true);
     }
 

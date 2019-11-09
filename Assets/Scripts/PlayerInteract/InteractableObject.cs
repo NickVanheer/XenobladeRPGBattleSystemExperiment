@@ -34,7 +34,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
         DiscoverRange = 7f;
     }
 
-    //Todo: reformat
     public void Update()
     {
         if (IsIncreaseLightIntensity)

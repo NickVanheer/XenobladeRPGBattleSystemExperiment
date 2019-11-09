@@ -111,7 +111,6 @@ public class AoEAttack : MonoBehaviour {
                 {
                     if (col.tag == "Player")
                     {
-                        Debug.Log("Player found");
                         foundActors.Add(col.gameObject);
                     }
                 }

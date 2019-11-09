@@ -52,9 +52,7 @@ public class PatrolEnemy : MonoBehaviour {
             float dist = Vector3.Distance(this.transform.position, TargetPosition);
 
             if(Mathf.Abs(dist) <= 2.0f)
-            {
                 isAtEnd = true;
-            }
         }
         else
         {

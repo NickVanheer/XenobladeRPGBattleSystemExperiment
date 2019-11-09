@@ -70,7 +70,7 @@ public class ModalMessageBox : NovaUIElement {
         //--> Manually create this so we might have more control when needed.
         GameObject gO = new GameObject();
         RectTransform r = gO.AddComponent<RectTransform>();
-        r.sizeDelta = new Vector2(200, 65);
+        r.sizeDelta = new Vector2(500, 65);
         gO.AddComponent<LayoutElement>();
 
         Text t = gO.AddComponent<Text>();

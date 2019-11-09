@@ -26,7 +26,7 @@ public class SphereEnemyAI : BaseAI {
         if (cleaveTimer >= CleaveAttackCooldown)
         {
             cleaveTimer = 0f;
-            actor.DoDamageAttackWithLabel(10, "Cleave", true);
+            actor.DoDamageAttackWithLabel(10, "(。-`ω´-)", true);
         }
 
         aoeTimer += Time.deltaTime;

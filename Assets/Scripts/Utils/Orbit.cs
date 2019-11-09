@@ -50,7 +50,5 @@ public class Orbit : MonoBehaviour
 
         transform.Translate(WorldOffsets, Space.World);
         transform.Translate(LocalOffsets, Space.Self);
-
- 
     }
 }

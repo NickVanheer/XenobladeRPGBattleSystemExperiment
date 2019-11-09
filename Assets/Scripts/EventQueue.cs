@@ -194,12 +194,6 @@ public class EventQueue : MonoBehaviour {
     public bool IsDebug = false;
     public List<string> DebugEventVisualizer;
 
-    /// <summary>
-    /// Filenames for save files
-    /// </summary>
-    /// C:\Users\Nick\AppData\LocalLow\DefaultCompany\NovaProject
-    public string EventFileName = "Event";
-
     private static EventQueue instance;
     public static EventQueue Instance
     {
