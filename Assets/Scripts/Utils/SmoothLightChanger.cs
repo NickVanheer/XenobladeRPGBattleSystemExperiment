@@ -15,7 +15,6 @@ public class SmoothLightChanger : MonoBehaviour {
     public void ChangeLight(bool fadeIn, float duration, float minLuminosity, float maxLuminosity, UnityAction callback = null)
     {
         StartCoroutine(fadeInAndOut(LightToChange, fadeIn, duration, minLuminosity, maxLuminosity, callback));
-
     }
 
     IEnumerator fadeInAndOut(Light lightToFade, bool fadeIn, float duration, float minLuminosity, float maxLuminosity, UnityAction callback = null)

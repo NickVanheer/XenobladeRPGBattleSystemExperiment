@@ -230,6 +230,7 @@ public class GameManager : MonoBehaviour {
     public int Gold = 0;
 
     public GameObject AreaOfEffectPrefab;
+    public GameObject AreaOfEffectFallingPrefab;
     public GameObject TwoRectangleAreaOfEffectPrefab;
     public GameObject GuestMemberPrefab;
 
@@ -448,6 +449,23 @@ public class GameManager : MonoBehaviour {
             return GetAvailableRandomPosition(range - 4);
     }
 
+    public bool IsUnitGrounded()
+    {
+        return true;
+        //TODO
+ /*
+        tryPos.y = GetPartyLeader().transform.position.y;
+
+        //raycast check
+        bool isHit = Physics.Raycast(tryPos, new Vector3(0, -1, 0), 5);
+
+        if (isHit)
+            return tryPos;
+        else
+            return GetAvailableRandomPosition(range - 4);
+        */
+    }
+
     public void SpawnAoE(GameObject instigator, Vector3 position, int damage, float duration = 3f)
     {
         if (AreaOfEffectPrefab == null)
@@ -480,9 +498,22 @@ public class GameManager : MonoBehaviour {
         if (AreaOfEffectPrefab == null)
             return;
 
-        GameObject AoE = Instantiate(AreaOfEffectPrefab, new Vector3(position.x, position.y, position.z), Quaternion.identity);
+        GameObject AoE = Instantiate(AreaOfEffectPrefab, position, Quaternion.identity);
         AoE.GetComponent<AoEAttack>().Instigator = instigator;
         AoE.GetComponent<AoEAttack>().PreviewDuration = duration;
+        AoE.GetComponent<AoEAttack>().Scale(scale);
+        AoE.GetComponent<AoEAttack>().Damage = damage;
+
+        ActiveAOEs++;
+    }
+
+    public void SpawnFallingAoE(GameObject instigator, Vector3 position, int damage, float scale, float duration = 3f)
+    {
+        if (AreaOfEffectFallingPrefab == null)
+            return;
+
+        GameObject AoE = Instantiate(AreaOfEffectFallingPrefab, position, Quaternion.identity);
+        AoE.GetComponent<AoEAttack>().SetupFallingAoEMode();
         AoE.GetComponent<AoEAttack>().Scale(scale);
         AoE.GetComponent<AoEAttack>().Damage = damage;
 

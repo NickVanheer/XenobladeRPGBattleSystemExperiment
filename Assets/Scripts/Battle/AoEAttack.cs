@@ -10,7 +10,7 @@ public class AoEAttack : MonoBehaviour {
     public float TextureScrollSpeed = 0.6f;
 
     private float durationTimer = 0;
-    private List<GameObject> foundActors;
+
     private Renderer rend;
     public float SphereRange = 50;
 
@@ -18,15 +18,49 @@ public class AoEAttack : MonoBehaviour {
     public GameObject SideA;
     public GameObject SideB;
 
+    public bool IsFallingAoE = false;
+    public float FallingHeight = 15;
+    public float FallingSpeed = 3;
+
     void Start () {
         durationTimer = PreviewDuration;
-        foundActors = new List<GameObject>();
 
         rend = GetComponent<Renderer>();
+
+        if(IsFallingAoE)
+            SetupFallingAoEMode();
+    }
+
+    void FallingAoECallback()
+    {
+        var intersectList = GetIntersects();
+
+        foreach (var item in intersectList)
+        {
+            RPGActor actor = item.GetComponent<RPGActor>();
+            if (actor.IsLeader)
+                item.GetComponent<RPGActor>().ReceiveIncidentalDamage(4, MagicElemancy.None);
+            CoreUIManager.Instance.SpawnLabel("AoE", GameManager.Instance.GetPartyLeader(), true);
+        }
+
+        GameObject.Destroy(this.gameObject);
+        GameManager.Instance.ActiveAOEs--;
+    }
+
+    public void SetupFallingAoEMode()
+    {
+        SmoothMoveToPosition m = GetComponent<SmoothMoveToPosition>();
+        this.transform.position = GameManager.Instance.GetPartyLeader().transform.position + new Vector3(0, FallingHeight, 0);
+        m.Speed = FallingSpeed;
+        m.StartSingleMoveAnimationToPosition(GameManager.Instance.GetPartyLeader().transform.position, FallingAoECallback);
+        IsFallingAoE = true;
     }
 	
 	void Update () {
 
+        if (IsFallingAoE)
+            return;
+        
         //visual
         float offset = Time.time * TextureScrollSpeed;
         if (IsRectangle)
@@ -47,8 +81,7 @@ public class AoEAttack : MonoBehaviour {
 
         if (durationTimer <= 0 && Instigator != null)
         {
-            CheckIntersect();
-            foreach (var actor in foundActors)
+            foreach (var actor in GetIntersects())
             {
                 if(actor.GetComponent<RPGActor>().IsLeader)
                     Instigator.GetComponent<RPGActor>().DoDamageAttack(Damage, MagicElemancy.Fire, actor, 3f);
@@ -78,7 +111,7 @@ public class AoEAttack : MonoBehaviour {
         Gizmos.DrawWireSphere(transform.position, SphereRange);
     }
 
-    public void CheckRectangleIntersect(GameObject Rectangle)
+    public void CheckRectangleIntersect(GameObject Rectangle, ref List<GameObject> resultList)
     {
         Collider c = Rectangle.GetComponent<BoxCollider>();
         Collider[] hits = Physics.OverlapBox(c.bounds.center, c.bounds.size / 2);
@@ -89,18 +122,20 @@ public class AoEAttack : MonoBehaviour {
             {
                 if (col.tag == "Player")
                 {
-                    foundActors.Add(col.gameObject);
+                    resultList.Add(col.gameObject);
                 }
             }
         }
     }
 
-    public void CheckIntersect()
+    public List<GameObject> GetIntersects()
     {
-        if(IsRectangle)
+        List<GameObject> results = new List<GameObject>();
+
+        if (IsRectangle)
         {
-            CheckRectangleIntersect(SideA);
-            CheckRectangleIntersect(SideB);
+            CheckRectangleIntersect(SideA, ref results);
+            CheckRectangleIntersect(SideB, ref results);
         }
         else
         {
@@ -111,10 +146,13 @@ public class AoEAttack : MonoBehaviour {
                 {
                     if (col.tag == "Player")
                     {
-                        foundActors.Add(col.gameObject);
+                        results.Add(col.gameObject);
                     }
                 }
             }
+
         }
+
+        return results;
     }
 }

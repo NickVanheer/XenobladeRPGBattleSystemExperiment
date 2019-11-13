@@ -38,6 +38,8 @@ public class levelLogic : MonoBehaviour {
 
         if(IsStartAtSpawnPoint2)
             GameManager.Instance.GetPartyLeader().GetComponent<Respawn>().RespawnAllAtSpawnPoint(PhaseTwoSpawnPoint);
+
+        EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
     }
 
     public void Update()
@@ -47,8 +49,7 @@ public class levelLogic : MonoBehaviour {
         {
             EventQueue.Instance.WaitABit(2f);
             EventQueue.Instance.AddAction(() => { Phase1Door.GetComponent<SmoothMoveToPosition>().enabled = true; });
-            EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(Phase1Door); });
-            EventQueue.Instance.WaitABit(3f);
+            EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
             EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("SomethingChanged"), 2);
 
             Phase1DestroyedCount = 0;
@@ -108,8 +109,7 @@ public class levelLogic : MonoBehaviour {
             BossObject.GetComponent<RPGActor>().Properties.ChangeLevel(BossLevel);
             BossObject.GetComponent<RPGActor>().Properties.Name = LocalizationManager.Instance.GetLocalizedValue("BossName");
 
-            EventQueue.Instance.AddAction(() => { Camera.main.GetComponent<FocusCamera>().Focus(BossObject); });
-            EventQueue.Instance.WaitABit(2);
+            EventQueue.Instance.AddFocusEvent(BossObject, 2);
             EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("letsbegin"),1.4f);
         }
     }

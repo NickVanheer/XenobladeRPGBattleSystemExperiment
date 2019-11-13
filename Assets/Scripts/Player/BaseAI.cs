@@ -9,6 +9,8 @@ public abstract class BaseAI : MonoBehaviour {
     public float MoveSpeed = 10;
     public float StartAttackTimer = 0;
     public bool CanFollowTarget = false;
+    [Range(0.4f,1.0f)]
+    public float ChaseSpeed = 0.6f;
 
     private float currentAttackTimer;
     protected RPGActor actor;
@@ -17,7 +19,9 @@ public abstract class BaseAI : MonoBehaviour {
     public float FarthestEngageDistance = 30;
 
     private GameObject playerOverheadHealthbar;
-    private Vector3 moveOffset = Vector3.zero;
+
+    private bool isMovingTowardsTarget = false;
+    private Vector3 targetPosition = Vector3.zero;
 
     private float updateDelay = 0.1f;
 
@@ -34,7 +38,6 @@ public abstract class BaseAI : MonoBehaviour {
     {
         while (true)
         {
-            moveOffset = Vector3.zero;
             if (actor.State == ActorState.Engaged && actor.TargetObject != null)
             {
                 //Only create the overhead healthbar when we're a player.
@@ -88,10 +91,10 @@ public abstract class BaseAI : MonoBehaviour {
             var distance = heading.magnitude;
             var direction = heading / distance; // This is now the normalized direction.
 
-            if (Mathf.Abs(distance) <= FarthestEngageDistance && Mathf.Abs(distance) >= ClosestEngageDistance)
+            if (Mathf.Abs(distance) <= 15) //TODO: Variable
             {
+                isMovingTowardsTarget = false;
                 currentAttackTimer -= Time.deltaTime;
-                moveOffset = Vector3.zero;
 
                 if (currentAttackTimer <= 0)
                 {
@@ -102,15 +105,14 @@ public abstract class BaseAI : MonoBehaviour {
                     ChainBarDisplayController.Instance.AddToChainBar(2);
                 }
             }
-            else
+            else if(CanFollowTarget)
             {
                 //We haven't made contact yet, move closer to target. Or we're marked to always follow the target
                 //Move back
-                if (Mathf.Abs(distance) < ClosestEngageDistance)
-                    direction = direction * -1;
 
-                direction.y = 0;
-                moveOffset = direction;
+                isMovingTowardsTarget = true;
+                targetPosition = actor.TargetObject.transform.position;
+                moveCloserToTarget();
             }
         }
 
@@ -131,11 +133,10 @@ public abstract class BaseAI : MonoBehaviour {
 
     public void LateUpdate()
     {
-        if (CanFollowTarget)
-            moveCloserToTarget(moveOffset);
+        //
     }
 
-    private void moveCloserToTarget(Vector3 directionVector)
+    private void moveCloserToTarget()
     {
         bool isMoving = false;
         PlayerMove moveControl = GetComponent<PlayerMove>();
@@ -143,14 +144,26 @@ public abstract class BaseAI : MonoBehaviour {
         if (moveControl != null)
             isMoving = moveControl.IsMoving;
 
+        var controller = GameManager.Instance.GetPartyLeader().GetComponent<CharacterController>();
+        if (controller != null)
+        {
+            if (Mathf.Abs(controller.velocity.y) > 0.1)
+                isMoving = true;
+        }
+
         if (!isMoving)
         {
+            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * ChaseSpeed);
+
+            /*
             CharacterController controller = GetComponent<CharacterController>();
 
             if(controller != null)
                 controller.Move(directionVector * MoveSpeed * Time.deltaTime);
             else
                 transform.Translate(directionVector * MoveSpeed * Time.deltaTime, Space.World);
+
+    */
         }
     }
 

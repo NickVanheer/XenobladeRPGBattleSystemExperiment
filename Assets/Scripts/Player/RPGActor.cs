@@ -256,10 +256,9 @@ public class RPGActor : MonoBehaviour {
     {
         DoDamageAttack(damage, MagicElemancy.None, target, 0);
     }
+
     public void DoDamageAttack(int damage, MagicElemancy element, GameObject target, float fontIncrement = 0, bool isSpecialDamage = false)
     {
-        BaseAI aiBase = GetComponent<BaseAI>();
-
         if (IsPlayer())
             ChainBarDisplayController.Instance.AddToChainBar(1.5f);
 
@@ -320,6 +319,16 @@ public class RPGActor : MonoBehaviour {
             CoreUIManager.Instance.SpawnText(dmg.ToString(), target, playerDMG, fontIncrement);
         else
             CoreUIManager.Instance.SpawnText(dmg.ToString(), target, enemyDMG, fontIncrement);
+    }
+
+    public void ReceiveIncidentalDamage(int damage, MagicElemancy element)
+    {
+        DamageInfo damageInfo = ResolveDamageUnitAGivesUnitB(this.Properties, this.Properties, damage);
+        int dmg = (int)damageInfo.TotalDamage;
+        this.Properties.ChangeHealth(-dmg);
+        this.SpawnDamageParticles(element);
+
+        CoreUIManager.Instance.SpawnText(dmg.ToString(), this.gameObject, CoreUIManager.Instance.PlayerTakeDamageColor, 1.6f);
     }
 
     public void Revive()

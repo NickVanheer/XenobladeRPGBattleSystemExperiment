@@ -17,13 +17,16 @@ public class BossSphereEnemyAI : BaseAI {
         {
             aoeTimer = 0f;
 
-            int kind = Random.Range(0, 2);
+            int kind = Random.Range(0, 3);
 
             if(kind == 0)
                 GameManager.Instance.SpawnAoE(this.gameObject, GameManager.Instance.GetPartyLeaderFloorObject().transform.position, 20, 4f, 4.0f);
 
             if(kind == 1)
                 GameManager.Instance.SpawnTwoRectangleAoE(this.gameObject, GetFloorPosition(), 20, 3.0f);
+
+            if (kind == 2)
+                GameManager.Instance.SpawnFallingAoE(this.gameObject, Vector3.zero, 20, 3.0f);
         }
 
         if (actor.Properties.GetHealthPercentage() < 50 && !isSpecialUsed)

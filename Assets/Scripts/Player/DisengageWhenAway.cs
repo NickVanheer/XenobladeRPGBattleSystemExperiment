@@ -55,8 +55,12 @@ public class DisengageWhenAway : MonoBehaviour {
                 }
             }
         }
-
-          
 		
 	}
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireSphere(transform.position, Range);
+    }
 }

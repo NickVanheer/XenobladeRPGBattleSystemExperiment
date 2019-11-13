@@ -129,11 +129,34 @@ public class ChangeLightEvent : Event
         this.Duration = duration;
     }
 
-
     public override void EventStart()
     {
         base.EventStart();
         GameManager.Instance.GetComponent<SmoothLightChanger>().ChangeLight(IsFadeIn, Duration, 0.1f, 3f, OnClose);
+    }
+
+    public void OnClose()
+    {
+        EventEnd();
+    }
+}
+
+[Serializable]
+public class FocusEvent : Event
+{
+    public GameObject gFocusObject;
+    public float Duration = 3f;
+
+    public FocusEvent(GameObject target, float duration)
+    {
+        this.gFocusObject = target;
+        this.Duration = duration;
+    }
+
+    public override void EventStart()
+    {
+        base.EventStart();
+        Camera.main.GetComponent<FocusCamera>().Focus(gFocusObject, Duration, OnClose);
     }
 
     public void OnClose()
@@ -294,6 +317,12 @@ public class EventQueue : MonoBehaviour {
     {
         ActionEvent ev = new ActionEvent(method);
         gameEvents.Enqueue(ev);
+    }
+
+    public void AddFocusEvent(GameObject target, float duration)
+    {
+        FocusEvent fe = new FocusEvent(target, duration);
+        gameEvents.Enqueue(fe);
     }
 
     public void AddMessageBox(string text, float messageSpeed)
