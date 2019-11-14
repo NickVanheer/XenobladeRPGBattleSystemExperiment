@@ -49,6 +49,9 @@ public class AoEAttack : MonoBehaviour {
 
     public void SetupFallingAoEMode()
     {
+        if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Dead)
+            return;
+
         SmoothMoveToPosition m = GetComponent<SmoothMoveToPosition>();
         this.transform.position = GameManager.Instance.GetPartyLeader().transform.position + new Vector3(0, FallingHeight, 0);
         m.Speed = FallingSpeed;

@@ -60,9 +60,16 @@ public class SkillbarController : MonoBehaviour {
 
     public void EnableAllSkills()
     {
+        /*
         foreach (var skill in GetComponent<RPGActor>().PartyMemberCommands)
         {
             skill.IsEnabled = true;
+        }
+        */
+
+        foreach (var skill in ActiveSkillsUIObjects)
+        {
+            skill.GetComponent<Command>().IsEnabled = true;
         }
     }
 

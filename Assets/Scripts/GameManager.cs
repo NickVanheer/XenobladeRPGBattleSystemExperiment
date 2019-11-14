@@ -535,6 +535,9 @@ public class GameManager : MonoBehaviour {
         if (AreaOfEffectFallingPrefab == null)
             return;
 
+        if (GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Dead)
+            return;
+
         GameObject AoE = Instantiate(AreaOfEffectFallingPrefab, position, Quaternion.identity);
         AoE.GetComponent<AoEAttack>().SetupFallingAoEMode();
         AoE.GetComponent<AoEAttack>().Scale(scale);

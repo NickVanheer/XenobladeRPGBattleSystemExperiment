@@ -57,7 +57,7 @@ public class AggroLineVisualizer : Track {
         }
       
         //For the players when just targetting
-        if (actor.tag == "Player" && actor.State == ActorState.Idle && actor.SoftTargetObject != null)
+        if (actor.tag == "Player" && /* actor.State == ActorState.Idle && */ actor.SoftTargetObject != null)
         {
             line.enabled = true;
             line.startColor = TargettingColor;

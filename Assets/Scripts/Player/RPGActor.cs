@@ -431,9 +431,6 @@ public class RPGActor : MonoBehaviour {
     public void SetTarget(GameObject target)
     {
         this.TargetObject = target;
-
-        if (this.tag == "Player")
-            CoreUIManager.Instance.ShowTargetDisplay(this.TargetObject);
     }
 
     public void SetSoftTarget(GameObject target)

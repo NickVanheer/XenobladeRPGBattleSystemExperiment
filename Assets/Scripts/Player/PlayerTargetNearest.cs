@@ -124,12 +124,9 @@ public class PlayerTargetNearest : MonoBehaviour {
 
         GetComponent<RPGActor>().SetSoftTarget(targets[tIndex]);
 
-        if(HasSoftTarget == false)
-        {
-            CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
-            CoreUIManager.Instance.ShowSkillDisplay();
-            HasSoftTarget = true;
-        }
+        CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
+        CoreUIManager.Instance.ShowSkillDisplay();
+        HasSoftTarget = true;
     }
 
     public void ClearTargetSelection()
