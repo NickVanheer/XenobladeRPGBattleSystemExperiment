@@ -217,6 +217,14 @@ public class RPGActor : MonoBehaviour {
         CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Break"), TargetObject, "Textures/Break_Icon");
     }
 
+    //on custom object
+    public void InflictBreak(RPGActor target)
+    {
+        target.Properties.InflictBreak();
+        CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Break"), target.gameObject, "Textures/Break_Icon");
+    }
+
+
     //on target
     public void InflictToppleOnTarget()
     {

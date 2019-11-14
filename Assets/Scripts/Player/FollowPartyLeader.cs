@@ -22,6 +22,9 @@ public class FollowPartyLeader : MonoBehaviour {
 	
 	void Update () {
 
+        if (GameManager.Instance.IsPausedForUI)
+            return;
+
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = 0f;
 

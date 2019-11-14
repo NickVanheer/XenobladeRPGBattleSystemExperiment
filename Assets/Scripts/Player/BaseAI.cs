@@ -74,7 +74,7 @@ public abstract class BaseAI : MonoBehaviour {
     }
 
     //Happens every frame
-    public virtual void Update () {
+    public void Update () {
 
         if (actor.State == ActorState.Engaged && actor.TargetObject != null)
         {
@@ -129,11 +129,6 @@ public abstract class BaseAI : MonoBehaviour {
             }
         }
 
-    }
-
-    public void LateUpdate()
-    {
-        //
     }
 
     private void moveCloserToTarget()

@@ -29,6 +29,7 @@ public class levelLogic : MonoBehaviour {
 
     [Header("Debug")]
     public bool IsStartAtSpawnPoint2 = false;
+    private bool isStartFocusAnimationPlayed = false;
 
     public GameObject BossObject = null;
 
@@ -45,8 +46,12 @@ public class levelLogic : MonoBehaviour {
     //The beginning of the game
     void OnEnterIdle()
     {
-        EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
-        CurrentProgress = LevelProgress.Started;
+        if (!isStartFocusAnimationPlayed)
+        {
+            EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
+            CurrentProgress = LevelProgress.Started;
+            isStartFocusAnimationPlayed = true;
+        }
     }
 
     public void Update()

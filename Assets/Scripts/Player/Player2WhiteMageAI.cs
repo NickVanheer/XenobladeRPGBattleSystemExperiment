@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player2AI : BaseAI {
+public class Player2WhiteMageAI : BaseAI {
 
     public override void DefaultAttack()
     {
         base.DefaultAttack();
 
-        if (actor.PartyMemberCommands.Count == 0)
-            return;
-
-        //Use aggro and break commands when ready
-        foreach (var attack in actor.PartyMemberCommands)
+        var healCommand = GetComponent<HealPartyMemberCommand>();
+        if (healCommand != null && healCommand.CanExecute())
         {
-            if (attack.CanExecute())
-                attack.UseCommand();
+            healCommand.UseCommand();
         }
     }
 

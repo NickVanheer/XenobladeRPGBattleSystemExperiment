@@ -239,7 +239,10 @@ public class GameManager : MonoBehaviour {
     public GameObject AreaOfEffectPrefab;
     public GameObject AreaOfEffectFallingPrefab;
     public GameObject TwoRectangleAreaOfEffectPrefab;
-    public GameObject GuestMemberPrefab;
+
+    public Transform GuestSpawnLocation;
+    public GameObject WarriorGuest;
+    public GameObject WhiteMageGuest;
 
     [Header("Upgrade Prices")]
     public int HealthUpgradePrice = 200;
@@ -549,13 +552,24 @@ public class GameManager : MonoBehaviour {
         CurrentState.StateEntry();
     }
 
-    public void SpawnGuestMember()
+    public void SpawnWarriorGuest()
     {
-        if (GuestMemberPrefab == null)
+        if (WarriorGuest == null)
             return;
 
-        Vector3 position = GetPartyLeader().transform.position + new Vector3(UnityEngine.Random.Range(-20, 20), 0, UnityEngine.Random.Range(-20, 20));
-        GameObject member = Instantiate(GuestMemberPrefab, position, Quaternion.identity);
+        //Vector3 position = GetPartyLeader().transform.position + new Vector3(UnityEngine.Random.Range(-20, 20), 0, UnityEngine.Random.Range(-20, 20));
+        GameObject member = Instantiate(WarriorGuest, GuestSpawnLocation.position, Quaternion.identity);
+
+        CurrentPartyMembers.Add(member);
+        CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
+    }
+
+    public void SpawnWhiteMageGuest()
+    {
+        if (WhiteMageGuest == null)
+            return;
+
+        GameObject member = Instantiate(WhiteMageGuest, GuestSpawnLocation.position, Quaternion.identity);
 
         CurrentPartyMembers.Add(member);
         CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
@@ -563,6 +577,46 @@ public class GameManager : MonoBehaviour {
 
     public void BuyPartyUpgradePrompt()
     {
+        LocalizedMessageOption warriorOption;
+        LocalizedMessageOption whiteMageOption;
+        LocalizedMessageOption noOption;
+
+        warriorOption.LocalizedValueTag = "Warrior_N";
+        warriorOption.actionToPerform = () => 
+        {
+            if (Gold >= PartyUpgradePrice)
+            {
+                Gold -= PartyUpgradePrice;
+                SpawnWarriorGuest();
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("PartyUpgraded"), 1f);
+            }
+            else
+            {
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("NotEnoughMoney"), 1f);
+            }
+        };
+
+        whiteMageOption.LocalizedValueTag = "whiteMage_N";
+        whiteMageOption.actionToPerform = () => 
+        {
+            if (Gold >= PartyUpgradePrice)
+            {
+                Gold -= PartyUpgradePrice;
+                SpawnWhiteMageGuest();
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("PartyUpgraded"), 1f);
+            }
+            else
+            {
+                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("NotEnoughMoney"), 1f);
+            }
+        };
+
+        noOption.LocalizedValueTag = "No";
+        noOption.actionToPerform = () => { EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("Kaomoji"), 1f); };
+
+        CoreUIManager.Instance.ShowMessageBoxWithOptions(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", warriorOption, whiteMageOption, noOption);
+
+        /*
         UnityAction yesAction = () =>
         {
             if (Gold >= PartyUpgradePrice)
@@ -580,6 +634,7 @@ public class GameManager : MonoBehaviour {
         UnityAction noAction = () => { EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("Kaomoji"), 1f); };
 
         CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", yesAction, noAction);
+    */
     }
 
     public void GameOverPrompt()

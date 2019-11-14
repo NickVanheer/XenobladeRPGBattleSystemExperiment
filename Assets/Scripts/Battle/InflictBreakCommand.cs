@@ -9,17 +9,26 @@ public class InflictBreakCommand : Command {
         Name = LocalizationManager.Instance.GetLocalizedValue("skillInflictBreak_N");
         ActionVariable += () =>
         {
-            RPGActor leader = GameManager.Instance.CurrentPartyMembers[0].GetComponent<RPGActor>();
-
-            if (leader != null && leader.State == ActorState.Engaged)
+            var enemies = GetComponent<RPGActor>().EngagedEnemies;
+            RPGActor enemyToBreak = null;
+            foreach (var enemy in enemies)
             {
-                CoreUIManager.Instance.SpawnLabel(Name, this.gameObject);
-                GetComponent<RPGActor>().InflictBreakOnTarget();
+                if (enemy.GetComponent<RPGActor>().Properties.IsBreak == false)
+                    enemyToBreak = enemy.GetComponent<RPGActor>();
             }
+
+            CoreUIManager.Instance.SpawnLabel(Name, this.gameObject);
+            GetComponent<RPGActor>().InflictBreak(enemyToBreak);
         };
 
         ResetCommand();
         IsEnabled = true;
         GetComponent<RPGActor>().PartyMemberCommands.Add(this);
 	}
+
+    //Get realtime localized value when needed.
+    public override string GetName()
+    {
+        return LocalizationManager.Instance.GetLocalizedValue("skillInflictBreak_N");
+    }
 }
