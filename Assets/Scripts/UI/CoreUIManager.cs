@@ -204,7 +204,7 @@ public class CoreUIManager : MonoBehaviour {
         }
     }
 
-    public GameObject CreateOverheadHealthBar(GameObject target, bool isEnemy = false)
+    public GameObject CreateOverheadHealthBar(GameObject target)
     {
         if (OverheadHealthBar == null)
             return null;

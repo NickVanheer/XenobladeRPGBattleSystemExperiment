@@ -17,6 +17,12 @@ public class PlayerTargetNearest : MonoBehaviour {
         if (GetComponent<RPGActor>().State == ActorState.Engaged)
             return;
 
+        if(GetComponent<RPGActor>().State == ActorState.Dead)
+        {
+            ClearTargetSelection();
+            return;
+        }
+
         //Disengage soft target when pressing escape.
         if (GetComponent<RPGActor>().State == ActorState.Idle)
         {
@@ -44,41 +50,62 @@ public class PlayerTargetNearest : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            List<GameObject> found = GetComponent<RPGActor>().GetNearestEnemiesForPlayer(Range);
-
-            if (found.Count <= 0)
-                return;
-
-            //loop backwards and destroy eventual dead references
-            for (int i = targets.Count - 1; i >= 0; i--)
-            {
-                if (targets[i] == null)
-                    targets.RemoveAt(i);
-            }
-
-            //We've found some potential enemies, 
-            //The amount of new enemies is different from what was there before refresh target list.
-            if (found.Count != totalFound)
-            {
-                targets.Clear();
-                foreach (GameObject gO in found)
-                {
-                    targets.Add(gO);
-                }
-                totalFound = targets.Count;
-
-                tIndex = 0;
-            }
-            else
-            {
-                tIndex++;
-
-                if (tIndex > targets.Count - 1)
-                    tIndex = 0;
-            }
-
-            SoftTarget();
+            TabKeyPress();
         }
+    }
+
+    public void TabKeyPress()
+    {
+        List<GameObject> found = GetComponent<RPGActor>().GetNearestEnemiesForPlayer(Range);
+
+        if (found.Count <= 0)
+            return;
+
+        //loop backwards and destroy eventual dead references
+        for (int i = targets.Count - 1; i >= 0; i--)
+        {
+            if (targets[i] == null)
+                targets.RemoveAt(i);
+        }
+
+        //We've found some potential enemies, 
+        //The amount of new enemies is different from what was there before refresh target list.
+        if (found.Count != totalFound)
+        {
+            targets.Clear();
+            foreach (GameObject gO in found)
+            {
+                targets.Add(gO);
+            }
+            totalFound = targets.Count;
+
+            tIndex = 0;
+        }
+        else
+        {
+            tIndex++;
+
+            if (tIndex > targets.Count - 1)
+                tIndex = 0;
+        }
+
+        SoftTarget();
+    }
+
+    public void SelectEnemyOnTouch(GameObject gO)
+    {
+        GetComponent<RPGActor>().SetSoftTarget(gO);
+
+        CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
+        CoreUIManager.Instance.ShowSkillDisplay();
+
+        //Reset all skills and their cooldowns
+        foreach (var player in GameManager.Instance.CurrentPartyMembers)
+        {
+            player.GetComponent<RPGActor>().ResetCommands();
+        }
+
+        HasSoftTarget = true;
     }
 
     void SoftTarget()

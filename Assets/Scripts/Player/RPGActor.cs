@@ -84,7 +84,8 @@ public class RPGActor : MonoBehaviour {
         StateDebugString = State.ToString();
         EngagedEnemiesCount = EngagedEnemies.Count;
 
-        if (Properties.CurrentHealth <= 0)
+        //Handle death
+        if (Properties.CurrentHealth <= 0 && State != ActorState.Dead)
         {
             EnterDeathState();
 
@@ -93,6 +94,8 @@ public class RPGActor : MonoBehaviour {
                 //Do things that need to happen when the party leader dies
                 CoreUIManager.Instance.HideSkillDisplay();
             }
+
+            return;
         }
 
         if(Properties.IsBreak)
@@ -132,6 +135,10 @@ public class RPGActor : MonoBehaviour {
             var pMembers = GameManager.Instance.GetPartyMembers();
             foreach (var member in pMembers)
             {
+  
+                if (member.Properties.CurrentHealth <= 0)
+                    member.Properties.CurrentHealth = 1;
+
                 member.EnterIdleState();
             }
 
@@ -150,7 +157,7 @@ public class RPGActor : MonoBehaviour {
             {
                 EngagedEnemies.RemoveAt(i);
             }
-            else if (EngagedEnemies[i].GetComponent<RPGActor>().Properties.CurrentHealth <= 0)
+            else if (EngagedEnemies[i].GetComponent<RPGActor>().State == ActorState.Dead)
             {
                 //add experience and destroy enemies when we're a player, use isExpAwarded to ensure we only do it once
                 if (this.tag == "Player" && EngagedEnemies[i].GetComponent<RPGActor>().isExpAwarded == false)
@@ -196,20 +203,6 @@ public class RPGActor : MonoBehaviour {
             Destroy(muzzleVFX, muzzleParticle.main.duration);
     }
 
-    public void CheckDisengage()
-    {
-        for (int i = EngagedEnemies.Count - 1; i >= 0; i--)
-        {
-            GameObject enemy = EngagedEnemies[i];
-            float distance = Vector3.Distance(enemy.transform.position, this.transform.position);
-            if (Mathf.Abs(distance) > 100)
-            {
-                disengage(i);
-                GameManager.Instance.Log("Actor: " + this.name + " -> Distance between " + enemy.name + " and " + this.name + " is too big. Disengaging and removing " + enemy.name + " from enemies. Current enemy list count: " + EngagedEnemies.Count + ".");
-            }
-        }
-    }
-
     //on target
     public void InflictBreakOnTarget()
     {
@@ -223,7 +216,6 @@ public class RPGActor : MonoBehaviour {
         target.Properties.InflictBreak();
         CoreUIManager.Instance.SpawnLabel(LocalizationManager.Instance.GetLocalizedValue("Break"), target.gameObject, "Textures/Break_Icon");
     }
-
 
     //on target
     public void InflictToppleOnTarget()
@@ -392,14 +384,6 @@ public class RPGActor : MonoBehaviour {
         SetTarget(SoftTargetObject);
     }
 
-    private void disengage(int index)
-    {
-        EngagedEnemies.RemoveAt(index);
-
-        if (EngagedEnemies.Count == 0)
-            EnterIdleState();
-    }
-
     public void EnterDeathState()
     {
         if (State == ActorState.Dead)
@@ -452,6 +436,7 @@ public class RPGActor : MonoBehaviour {
         EngagedEnemies.Clear();
         EnterIdleState();
 
+        SoftTargetObject = null;
         TargetObject = null;
     }
 
@@ -466,7 +451,7 @@ public class RPGActor : MonoBehaviour {
             GameManager.Instance.LogError("Couldn't find gameObject " + gO.name + "in actor " + this.name + "'s list of engaged enemies");
     }
 
-    public void EngageTarget(bool notifyEnemy = false) //TODO: Reformat. Not implemented
+    public void EngageTarget(bool notifyEnemy = false) 
     {
         Assert.IsNotNull(TargetObject, "Trying to Engage Target that isn't there, set a target with SetTarget()");
 
@@ -478,11 +463,17 @@ public class RPGActor : MonoBehaviour {
         {
             foreach (var member in GameManager.Instance.CurrentPartyMembers)
             {
+                /*
                 if (EngagedEnemies.Contains(member))
                     return;
 
                 //Add to engaged enemy list if target is new
                 EngagedEnemies.Add(member);
+
+                */
+
+                if (!EngagedEnemies.Contains(member))
+                    EngagedEnemies.Add(member);
             }
         }
         else

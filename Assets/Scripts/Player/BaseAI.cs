@@ -2,35 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AIAnimation { Idle, Moving, Attacking}; 
+public enum AIAnimation { Idle, Moving, Attacking};
+public enum PositionTowardsEnemy
+{
+    TooFarAway, JustRight, TooClose
+}
+
 public abstract class BaseAI : MonoBehaviour {
 
     public float AttackTimer = 2;
     public float MoveSpeed = 10;
     public float StartAttackTimer = 0;
     public bool CanFollowTarget = false;
-    [Range(0.4f,1.0f)]
-    public float ChaseSpeed = 0.6f;
+    [Range(8,30)]
+    public float ChaseSpeed = 15f;
 
     private float currentAttackTimer;
     protected RPGActor actor;
 
-    public float ClosestEngageDistance = 10;
-    public float FarthestEngageDistance = 30;
-
     private GameObject playerOverheadHealthbar;
-
     private bool isMovingTowardsTarget = false;
-    private Vector3 targetPosition = Vector3.zero;
-
     private float updateDelay = 0.1f;
+
+    public PositionTowardsEnemy thisRelativeToEnemy;
 
     void Start () {
         actor = GetComponent<RPGActor>();
+        actor.OnDestroyCallBack.AddListener(actorDestroyed);
+
         CalculateAutoAttackDelayBasedOnSpeed();
         currentAttackTimer = StartAttackTimer;
 
         StartCoroutine(UpdateCoroutine());
+  
+    }
+
+    void actorDestroyed()
+    {
+        if (playerOverheadHealthbar != null)
+            playerOverheadHealthbar.gameObject.SetActive(false);
     }
 
     //Happens every updateDelay seconds
@@ -41,8 +51,11 @@ public abstract class BaseAI : MonoBehaviour {
             if (actor.State == ActorState.Engaged && actor.TargetObject != null)
             {
                 //Only create the overhead healthbar when we're a player.
-                if (gameObject.tag == "Player" && playerOverheadHealthbar == null)
+                if (/* gameObject.tag == "Player" && */ playerOverheadHealthbar == null)
                     playerOverheadHealthbar = CoreUIManager.Instance.CreateOverheadHealthBar(this.gameObject);
+
+                if (gameObject.tag == "Enemy")
+                    playerOverheadHealthbar.GetComponent<World3DUIObject>().SetImageFillColor(Color.red);
 
                 if (playerOverheadHealthbar != null)
                     playerOverheadHealthbar.gameObject.SetActive(true);
@@ -73,10 +86,47 @@ public abstract class BaseAI : MonoBehaviour {
         }
     }
 
+    void HandleTooFar()
+    {
+        if (!CanFollowTarget)
+            return;
+
+        //We haven't made contact yet, move closer to target. Or we're marked to always follow the target
+        //Move towards
+        isMovingTowardsTarget = true;
+        moveToTarget(1f);
+    }
+
+    void HandleTooClose()
+    {
+        if (!CanFollowTarget)
+            return;
+
+        //We haven't made contact yet, move closer to target. Or we're marked to always follow the target
+        //Move back
+        isMovingTowardsTarget = true;
+        moveToTarget(-1f);
+    }
+
+    void HandleJustRight()
+    {
+        isMovingTowardsTarget = false;
+        currentAttackTimer -= Time.deltaTime;
+
+        if (currentAttackTimer <= 0)
+        {
+            DefaultAttack(); //overrides in derived
+            currentAttackTimer = AttackTimer;
+
+            //Add to chain gauge
+            ChainBarDisplayController.Instance.AddToChainBar(2);
+        }
+    }
+
     //Happens every frame
     public void Update () {
 
-        if (actor.State == ActorState.Engaged && actor.TargetObject != null)
+        if (actor.State == ActorState.Engaged && actor.TargetObject != null && actor.Target.State != ActorState.Dead)
         {
             //Rotate leader towards target when we're not moving ourselves
             if (actor.IsLeader && !GetComponent<PlayerMove>().IsMoving)
@@ -91,28 +141,45 @@ public abstract class BaseAI : MonoBehaviour {
             var distance = heading.magnitude;
             var direction = heading / distance; // This is now the normalized direction.
 
-            if (Mathf.Abs(distance) <= 15) //TODO: Variable
+            float engageDist = 15;
+            float minEngageDist = 5;
+            EngageZone targetZone = actor.TargetObject.GetComponent<EngageZone>();
+
+            if (targetZone != null)
             {
-                isMovingTowardsTarget = false;
-                currentAttackTimer -= Time.deltaTime;
-
-                if (currentAttackTimer <= 0)
-                {
-                    DefaultAttack(); //overrides in derived
-                    currentAttackTimer = AttackTimer;
-
-                    //Add to chain gauge
-                    ChainBarDisplayController.Instance.AddToChainBar(2);
-                }
+                engageDist = targetZone.EngageZoneDistance;
+                minEngageDist = targetZone.EngageZoneDistanceClosest;
             }
-            else if(CanFollowTarget)
-            {
-                //We haven't made contact yet, move closer to target. Or we're marked to always follow the target
-                //Move back
 
-                isMovingTowardsTarget = true;
-                targetPosition = actor.TargetObject.transform.position;
-                moveCloserToTarget();
+            //Too far, move towards enemy
+            if (CanFollowTarget && Mathf.Abs(distance) >= engageDist)
+                thisRelativeToEnemy = PositionTowardsEnemy.TooFarAway;
+
+            //We're in the right range
+            if (CanFollowTarget && Mathf.Abs(distance) < engageDist)
+                thisRelativeToEnemy = PositionTowardsEnemy.JustRight;
+
+            //Too close, move back
+            if (CanFollowTarget && Mathf.Abs(distance) < minEngageDist)
+                thisRelativeToEnemy = PositionTowardsEnemy.TooClose;
+
+            //If we can't move, then just attack regardless of position (i.e for static enemies only)
+            if (!CanFollowTarget)
+                thisRelativeToEnemy = PositionTowardsEnemy.JustRight;
+
+            switch (thisRelativeToEnemy)
+            {
+                case PositionTowardsEnemy.TooFarAway:
+                    HandleTooFar();
+                    break;
+                case PositionTowardsEnemy.JustRight:
+                    HandleJustRight();
+                    break;
+                case PositionTowardsEnemy.TooClose:
+                    HandleTooClose();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -131,7 +198,7 @@ public abstract class BaseAI : MonoBehaviour {
 
     }
 
-    private void moveCloserToTarget()
+    private void moveToTarget(float directionIncrement)
     {
         bool isMoving = false;
         PlayerMove moveControl = GetComponent<PlayerMove>();
@@ -148,17 +215,14 @@ public abstract class BaseAI : MonoBehaviour {
 
         if (!isMoving)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * ChaseSpeed);
+            Vector3 moveDir = (actor.TargetObject.transform.position - transform.position).normalized * directionIncrement;
 
-            /*
-            CharacterController controller = GetComponent<CharacterController>();
+            CharacterController cont = GetComponent<CharacterController>();
 
-            if(controller != null)
-                controller.Move(directionVector * MoveSpeed * Time.deltaTime);
+            if(cont != null)
+                cont.Move(moveDir * Time.deltaTime * ChaseSpeed);
             else
-                transform.Translate(directionVector * MoveSpeed * Time.deltaTime, Space.World);
-
-    */
+                transform.Translate(moveDir * ChaseSpeed * Time.deltaTime, Space.World);
         }
     }
 

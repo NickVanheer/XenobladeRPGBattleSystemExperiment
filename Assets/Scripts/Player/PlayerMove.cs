@@ -138,6 +138,12 @@ public class PlayerMove : MonoBehaviour {
         if (Physics.Raycast(ray, out hit, 5000f))
             return hit.point;
 
+        //Target the enemy when selected. (a bit of a hack)
+        if(hit.transform.gameObject.tag == "Enemy")
+        {
+            GetComponent<PlayerTargetNearest>().SelectEnemyOnTouch(hit.transform.gameObject);
+        }
+
         return this.transform.position;
     }
 

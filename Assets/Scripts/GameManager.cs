@@ -67,7 +67,10 @@ public class IdleState : GameState
     {
         //We don't have a soft target, show the pause/exit game message prompt.
         bool isSelectingTarget = gameManager.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget && gameManager.GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
-        if (Input.GetKeyDown(KeyCode.Escape) && !isSelectingTarget)
+        if (isSelectingTarget)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             gameManager.ExitGamePrompt();
         }

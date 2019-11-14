@@ -51,12 +51,12 @@ public class AggroLineVisualizer : Track {
             else
                 SetupAggroBezier(line, actor.TargetObject.transform.position);
         }
-        else
+        else if(actor.tag == "Enemy")
         {
             line.enabled = false;
         }
       
-        //For the players
+        //For the players when just targetting
         if (actor.tag == "Player" && actor.State == ActorState.Idle && actor.SoftTargetObject != null)
         {
             line.enabled = true;
@@ -65,6 +65,10 @@ public class AggroLineVisualizer : Track {
 
             line.material.color = TargettingColor;
             SetupAggroBezier(line, actor.SoftTargetObject.transform.position);
+        }
+        else if(actor.tag == "Player")
+        {
+            line.enabled = false;
         }
 	}
 
