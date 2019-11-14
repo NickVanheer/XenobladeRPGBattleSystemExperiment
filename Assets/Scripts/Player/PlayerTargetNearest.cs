@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerTargetNearest : MonoBehaviour {
 
     public float Range = 150;
-    public bool HasSoftTarget = false;
+    //public bool HasSoftTarget = false;
     List<GameObject> targets = new List<GameObject>();
     int tIndex = 0;
     int totalFound = 0;
@@ -30,7 +30,7 @@ public class PlayerTargetNearest : MonoBehaviour {
             }
         }
 
-        if(HasSoftTarget)
+        if(GetComponent<RPGActor>().SoftTargetObject != null)
         {
             bool isEngagedWithSoftTarget = GetComponent<RPGActor>().EngagedEnemies.Contains(GetComponent<RPGActor>().SoftTargetObject);
 
@@ -75,9 +75,26 @@ public class PlayerTargetNearest : MonoBehaviour {
                 targets.RemoveAt(i);
         }
 
+
+        int sameCount = 0;
+
+        foreach (var gO in found)
+        {
+            bool f = false;
+            foreach (var item in targets)
+            {
+                if (item.name == gO.name)
+                    f = true;
+            }
+
+            if (f)
+                sameCount++;
+        }
+
+
         //We've found some potential enemies, 
         //The amount of new enemies is different from what was there before refresh target list.
-        if (found.Count != totalFound)
+        if (found.Count != sameCount)
         {
             targets.Clear();
             foreach (GameObject gO in found)
@@ -123,22 +140,14 @@ public class PlayerTargetNearest : MonoBehaviour {
             return; 
 
         GetComponent<RPGActor>().SetSoftTarget(targets[tIndex]);
-
-        CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
-        CoreUIManager.Instance.ShowSkillDisplay();
-        HasSoftTarget = true;
     }
 
     public void ClearTargetSelection()
     {
-        HasSoftTarget = false;
         tIndex = 0;
         totalFound = 0;
         targets.Clear();
         GetComponent<RPGActor>().UnsetSoftTarget();
-
-        CoreUIManager.Instance.HideTargetDisplay();
-        CoreUIManager.Instance.HideSkillDisplay();
     }
 
     private void OnDrawGizmosSelected()

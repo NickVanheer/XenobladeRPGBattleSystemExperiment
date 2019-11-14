@@ -29,7 +29,7 @@ public class PlayerInteract : MonoBehaviour {
             if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().State != ActorState.Idle)
                 return;
 
-            if (GameManager.Instance.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget)
+            if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().SoftTargetObject != null)
                 return;
 
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, InteractDistance);

@@ -25,8 +25,8 @@ public class GameStartState : GameState
 
     public override void StateEntry()
     {
-        CoreUIManager.Instance.HideTargetDisplay();
-        CoreUIManager.Instance.HideSkillDisplay();
+        //CoreUIManager.Instance.HideTargetDisplay();
+        //CoreUIManager.Instance.HideSkillDisplay();
         CoreUIManager.Instance.HideRevivePrompt();
 
         ChainBarDisplayController.Instance.gameObject.SetActive(false);
@@ -49,8 +49,8 @@ public class IdleState : GameState
 
     public override void StateEntry()
     {
-        CoreUIManager.Instance.HideTargetDisplay();
-        CoreUIManager.Instance.HideSkillDisplay();
+        //CoreUIManager.Instance.HideTargetDisplay();
+        //CoreUIManager.Instance.HideSkillDisplay();
 
         if(CoreUIManager.Instance.SkillBarControl != null)
             CoreUIManager.Instance.SkillBarControl.InitializeSkills();
@@ -94,7 +94,7 @@ public class BattleState : GameState
 
         SkillbarController.Instance.EnableAllSkills();
 
-        CoreUIManager.Instance.ShowSkillDisplay();
+        //CoreUIManager.Instance.ShowSkillDisplay();
 
         //Reset all skills and their cooldowns
         foreach (var player in gameManager.CurrentPartyMembers)
@@ -135,7 +135,9 @@ public class BattleState : GameState
             if (deadCount == partyMemberCount)
                 GameManager.Instance.EnterGameOverState();
 
-            if(GameManager.Instance.CurrentPartyMembers[0].GetComponent<RPGActor>().State == ActorState.Idle)
+            GameObject leader = GameManager.Instance.GetPartyLeader();
+
+            if(leader != null && leader.GetComponent<RPGActor>().State == ActorState.Idle)
             {
                 //done with battle, time to move on.
                 GameManager.Instance.EnterIdleState();
@@ -165,8 +167,8 @@ public class GameOverState : GameState
 
     public override void StateEntry()
     {
-        CoreUIManager.Instance.HideTargetDisplay();
-        CoreUIManager.Instance.HideSkillDisplay();
+        //CoreUIManager.Instance.HideTargetDisplay();
+        //CoreUIManager.Instance.HideSkillDisplay();
         CoreUIManager.Instance.HideRevivePrompt();
 
         ChainBarDisplayController.Instance.gameObject.SetActive(false);
@@ -326,7 +328,7 @@ public class GameManager : MonoBehaviour {
             CurrentState.StateUpdate();
 
         //We don't have a soft target, show the pause/exit game message prompt.
-        bool isSelectingTarget = GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget && GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
+        bool isSelectingTarget = GetPartyLeader().GetComponent<RPGActor>().SoftTargetObject != null && GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
         if (isSelectingTarget)
             return;
 
@@ -373,7 +375,10 @@ public class GameManager : MonoBehaviour {
 
     public RPGActor GetLeaderActor()
     {
-        return GetPartyLeader().GetComponent<RPGActor>();
+        var leader = GetPartyLeader();
+        if(leader != null)
+            return leader.GetComponent<RPGActor>();
+        return null;
     }
 
     public GameObject GetPartyLeaderFloorObject()

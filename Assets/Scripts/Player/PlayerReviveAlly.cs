@@ -27,6 +27,7 @@ public class PlayerReviveAlly : MonoBehaviour {
             {
                 ChainBarDisplayController.Instance.UseChainSegment();
                 ally.GetComponent<RPGActor>().Revive();
+                CoreUIManager.Instance.HideRevivePrompt();
             }
 
         }

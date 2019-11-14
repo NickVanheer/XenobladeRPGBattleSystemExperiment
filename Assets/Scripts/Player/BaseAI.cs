@@ -195,7 +195,6 @@ public abstract class BaseAI : MonoBehaviour {
                 currentAttackTimer = AttackTimer;
             }
         }
-
     }
 
     private void moveToTarget(float directionIncrement)

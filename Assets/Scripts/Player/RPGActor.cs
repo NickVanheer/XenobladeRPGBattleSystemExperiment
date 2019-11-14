@@ -76,6 +76,28 @@ public class RPGActor : MonoBehaviour {
         return this.gameObject.tag == "Player";
     }
 
+    void HandleUIForLeader()
+    {
+        if (IsLeader && isPlayer)
+        {
+            if (SoftTargetObject != null)
+            {
+                CoreUIManager.Instance.ShowTargetDisplay(SoftTargetObject);
+                CoreUIManager.Instance.ShowSkillDisplay();
+            }
+            else if (TargetObject != null)
+            {
+                CoreUIManager.Instance.ShowTargetDisplay(TargetObject);
+                CoreUIManager.Instance.ShowSkillDisplay();
+            }
+            else
+            {
+                CoreUIManager.Instance.HideTargetDisplay();
+                CoreUIManager.Instance.HideSkillDisplay();
+            }
+        }
+    }
+
     void Update () {
 
         if (IsDebugDeathTest)
@@ -84,17 +106,12 @@ public class RPGActor : MonoBehaviour {
         StateDebugString = State.ToString();
         EngagedEnemiesCount = EngagedEnemies.Count;
 
+        HandleUIForLeader();
+
         //Handle death
         if (Properties.CurrentHealth <= 0 && State != ActorState.Dead)
         {
             EnterDeathState();
-
-            if(isPlayer && IsLeader)
-            {
-                //Do things that need to happen when the party leader dies
-                CoreUIManager.Instance.HideSkillDisplay();
-            }
-
             return;
         }
 
@@ -118,26 +135,23 @@ public class RPGActor : MonoBehaviour {
         if (State == ActorState.Engaged)
         {
             CheckForDeathTargets();
+            CheckForIdleState();
 
             //target has died, assign new one or exit state
             if (Target == null && EngagedEnemies.Count > 0)
                     SetTarget(EngagedEnemies[0]); //DO engaged enemies count in gamemanager
-
         }
 	}
 
-    public void CheckForDeathTargets()
+    public void CheckForIdleState()
     {
         if (IsLeader && EngagedEnemies.Count == 0)
         {
-            GetComponent<PlayerTargetNearest>().ClearTargetSelection();
-
             var pMembers = GameManager.Instance.GetPartyMembers();
             foreach (var member in pMembers)
             {
-  
                 if (member.Properties.CurrentHealth <= 0)
-                    member.Properties.CurrentHealth = 1;
+                    member.Properties.CurrentHealth = 1; //When zero it could mark as the player being death instead
 
                 member.EnterIdleState();
             }
@@ -149,7 +163,10 @@ public class RPGActor : MonoBehaviour {
             EnterIdleState();
             return;
         }
+    }
 
+    public void CheckForDeathTargets()
+    {
         //check for death enemies
         for (int i = EngagedEnemies.Count - 1; i >= 0; i--)
         {
@@ -336,10 +353,41 @@ public class RPGActor : MonoBehaviour {
         if (State != ActorState.Dead)
             GameManager.Instance.LogError("Trying to revive actor " + this.name + " while alive.");
 
-        EnterIdleState();
         TargetObject = null;
+        EngagedEnemies.Clear();
         SoftTargetObject = null;
         RestoreHP(30, true);
+
+        //Engage this unit in battle again
+        if (GameManager.Instance.CurrentState == GameManager.Instance.StateBattle)
+        {
+            if (IsLeader)
+            {
+                RPGActor activeUnit = null;
+                foreach (var pMember in GameManager.Instance.CurrentPartyMembers)
+                {
+                    if (pMember.GetComponent<RPGActor>().State == ActorState.Engaged)
+                        activeUnit = pMember.GetComponent<RPGActor>();
+                }
+
+                if(activeUnit != null)
+                {
+                    TargetObject = activeUnit.TargetObject;
+                    SoftTargetObject = activeUnit.SoftTargetObject;
+                    EngagedEnemies = new List<GameObject>(activeUnit.EngagedEnemies);
+                }
+
+
+            }
+            else
+            {
+                TargetObject = GameManager.Instance.GetLeaderActor().TargetObject;
+                SoftTargetObject = GameManager.Instance.GetLeaderActor().SoftTargetObject;
+                EngagedEnemies = new List<GameObject>(GameManager.Instance.GetLeaderActor().EngagedEnemies);
+            }
+
+            EnterEngagedState();
+        }
     }
 
     public void RestoreHP(int percentage, bool showDamageNumber)
@@ -368,6 +416,10 @@ public class RPGActor : MonoBehaviour {
             GameManager.Instance.Log("Going into Death state while already in that state for unit " + this.name);
             return;
         }
+
+        this.EngagedEnemies.Clear();
+        this.TargetObject = null;
+        this.SoftTargetObject = null;
 
         State = ActorState.Dead;
         OnDestroyCallBack.Invoke();

@@ -85,7 +85,6 @@ public class ModalMessageBox : NovaUIElement {
         gO.SetActive(false);
         dialogOptionObjects.Add(gO);
         dialogOptionActions.Add(action);
-
     }
 
     private void disableModalOptions()
@@ -135,7 +134,7 @@ public class ModalMessageBox : NovaUIElement {
         //We make this slightly larger 
         if (DialogueWindow != null)
         {
-            int increase = dialogOptionObjects.Count * 30;
+            int increase = dialogOptionObjects.Count * 40;
             DialogueWindow.GetComponent<RectTransform>().sizeDelta = new Vector2(DialogueWindow.GetComponent<RectTransform>().sizeDelta.x, DialogueWindow.GetComponent<RectTransform>().sizeDelta.y + increase);
         }
     }

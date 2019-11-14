@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BossSphereEnemyAI : BaseAI {
 
-    public int AoESize = 1;
     public int AoECooldown = 4;
     public int GroupAttackCooldown = 9;
     bool isSpecialUsed = false;
@@ -26,7 +25,7 @@ public class BossSphereEnemyAI : BaseAI {
                 GameManager.Instance.SpawnTwoRectangleAoE(this.gameObject, GetFloorPosition(), 20, 3.0f);
 
             if (kind == 2)
-                GameManager.Instance.SpawnFallingAoE(this.gameObject, Vector3.zero, 20, 3.0f);
+                GameManager.Instance.SpawnFallingAoE(this.gameObject, Vector3.zero, 20, Random.Range(1,4));
         }
 
         if (actor.Properties.GetHealthPercentage() < 50 && !isSpecialUsed)
@@ -58,7 +57,7 @@ public class BossSphereEnemyAI : BaseAI {
             groupTimer = 0f;
             foreach (var player in GameManager.Instance.CurrentPartyMembers)
             {
-                actor.DoDamageAttack(6, player);
+                actor.DoDamageAttack(8, player);
             }
         }
 
