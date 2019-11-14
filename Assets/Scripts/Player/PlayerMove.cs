@@ -139,10 +139,11 @@ public class PlayerMove : MonoBehaviour {
             return hit.point;
 
         //Target the enemy when selected. (a bit of a hack)
-        if(hit.transform.gameObject.tag == "Enemy")
+        /* if(hit.transform.gameObject.tag == "Enemy")
         {
             GetComponent<PlayerTargetNearest>().SelectEnemyOnTouch(hit.transform.gameObject);
         }
+        */
 
         return this.transform.position;
     }

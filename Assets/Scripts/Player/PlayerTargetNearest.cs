@@ -12,10 +12,8 @@ public class PlayerTargetNearest : MonoBehaviour {
 
 	void Update () {
 
-        //Todo: Add support to engage multiple enemies and show the X cross on the engage skill only for targetted enemies we are already engaged with. 
-        //For now: only manually engage one enemy at the same time with the targetter
-        if (GetComponent<RPGActor>().State == ActorState.Engaged)
-            return;
+        //if (GetComponent<RPGActor>().State == ActorState.Engaged)
+            //return;
 
         if(GetComponent<RPGActor>().State == ActorState.Dead)
         {
@@ -34,7 +32,16 @@ public class PlayerTargetNearest : MonoBehaviour {
 
         if(HasSoftTarget)
         {
-            //check distance and untarget when too far away
+            bool isEngagedWithSoftTarget = GetComponent<RPGActor>().EngagedEnemies.Contains(GetComponent<RPGActor>().SoftTargetObject);
+
+            //Enable/disable initiate skills when enemy is already engaged with you.
+            if (isEngagedWithSoftTarget)
+                SkillbarController.Instance.EnableEngageAttackSkill(false);
+            else
+                SkillbarController.Instance.EnableEngageAttackSkill(true);
+
+            //check distance and untarget when too far away 
+            //TODO: Check if this can be incorporated into DisengageWhenDistanceBetweenEnemy.cs
             GameObject enemy = GetComponent<RPGActor>().SoftTargetObject;
 
             if(enemy != null)
@@ -91,7 +98,7 @@ public class PlayerTargetNearest : MonoBehaviour {
 
         SoftTarget();
     }
-
+    /*
     public void SelectEnemyOnTouch(GameObject gO)
     {
         GetComponent<RPGActor>().SetSoftTarget(gO);
@@ -108,6 +115,8 @@ public class PlayerTargetNearest : MonoBehaviour {
         HasSoftTarget = true;
     }
 
+    */
+
     void SoftTarget()
     {
         if (targets[tIndex] == null)
@@ -115,16 +124,12 @@ public class PlayerTargetNearest : MonoBehaviour {
 
         GetComponent<RPGActor>().SetSoftTarget(targets[tIndex]);
 
-        CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
-        CoreUIManager.Instance.ShowSkillDisplay();
-
-        //Reset all skills and their cooldowns
-        foreach (var player in GameManager.Instance.CurrentPartyMembers)
+        if(HasSoftTarget == false)
         {
-            player.GetComponent<RPGActor>().ResetCommands();
+            CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
+            CoreUIManager.Instance.ShowSkillDisplay();
+            HasSoftTarget = true;
         }
-
-        HasSoftTarget = true;
     }
 
     public void ClearTargetSelection()

@@ -45,7 +45,7 @@ public class KeepDistanceFromOtherPlayers : MonoBehaviour {
 
                 var distance = directionVector.magnitude;
                 var direction = directionVector / distance; // This is now the normalized direction.
-                //dir.y = 0;
+                direction.y = 0;
                 //this.transform.Translate(dir.normalized * Time.deltaTime * Speed, Space.World);
                 //GetComponent<CharacterController>().Move(direction * Time.deltaTime * Speed);
 

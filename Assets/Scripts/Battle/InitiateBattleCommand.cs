@@ -20,7 +20,7 @@ public class InitiateBattleCommand : Command {
             GetComponent<RPGActor>().TargetSoftTarget();
             GetComponent<RPGActor>().EngageTarget(true);
 
-            GameManager.Instance.EnterBattleState();
+   
         };
 
         ResetCommand();

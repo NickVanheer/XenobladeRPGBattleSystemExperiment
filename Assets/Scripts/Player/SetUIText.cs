@@ -53,7 +53,7 @@ public class SetUIText : MonoBehaviour {
 
         if (PropertyToDisplay == RPGPropertyType.CurrentSkillName)
         {
-            GameObject gO = SkillbarController.Instance.ActiveSkills[SkillbarController.Instance.SelectedIndex];
+            GameObject gO = SkillbarController.Instance.ActiveSkillsUIObjects[SkillbarController.Instance.SelectedIndex];
             if (gO != null)
             {
                 RPGActor leaderActor = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>();
@@ -67,7 +67,7 @@ public class SetUIText : MonoBehaviour {
 
         if (PropertyToDisplay == RPGPropertyType.CurrentSkillDescription)
         {
-            GameObject gO = SkillbarController.Instance.ActiveSkills[SkillbarController.Instance.SelectedIndex];
+            GameObject gO = SkillbarController.Instance.ActiveSkillsUIObjects[SkillbarController.Instance.SelectedIndex];
 
             if (gO != null)
             {

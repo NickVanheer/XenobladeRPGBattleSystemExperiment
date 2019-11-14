@@ -8,7 +8,7 @@ public class SkillbarController : MonoBehaviour {
     //public bool IsActive = false;
     public int SelectedIndex = 2;
 
-    public List<GameObject> ActiveSkills = new List<GameObject>();
+    public List<GameObject> ActiveSkillsUIObjects = new List<GameObject>();
     private RPGActor leaderActor;
 
     static SkillbarController instance;
@@ -31,18 +31,18 @@ public class SkillbarController : MonoBehaviour {
         //At the beginning of a battle, starting all cooldowns   
         leaderActor = GameManager.Instance.CurrentPartyMembers[0].GetComponent<RPGActor>();
 
-        foreach (var displaySkill in ActiveSkills)
+        foreach (var displaySkill in ActiveSkillsUIObjects)
         {
             displaySkill.SetActive(false);
         }
 
         foreach (Command cmd in leaderActor.PartyMemberCommands)
         {
-            ActiveSkills[cmd.Slot].SetActive(true);
+            ActiveSkillsUIObjects[cmd.Slot].SetActive(true);
             //cmd.ResetCommand(); //Done manually for each command in case some skills have to be active from the start etc.
 
             //icon
-            Transform iconTransform = ActiveSkills[cmd.Slot].gameObject.transform.FindDeepChild("SkillIcon");
+            Transform iconTransform = ActiveSkillsUIObjects[cmd.Slot].gameObject.transform.FindDeepChild("SkillIcon");
 
             if (iconTransform != null)
             {
@@ -60,15 +60,17 @@ public class SkillbarController : MonoBehaviour {
 
     public void EnableAllSkills()
     {
-        foreach (var skill in ActiveSkills)
+        foreach (var skill in GetComponent<RPGActor>().PartyMemberCommands)
         {
-            skill.GetComponent<Command>().IsEnabled = true;
+            skill.IsEnabled = true;
         }
     }
 
-    public void ToggleAutoAttackSkill(bool isEnabled)
+    public void EnableEngageAttackSkill(bool isEnabled)
     {
-        ActiveSkills[2].GetComponent<Command>().IsEnabled = isEnabled;
+        Command startBattleCommand = leaderActor.GetCommandAtSlotIndex(2);
+        startBattleCommand.IsEnabled = isEnabled;
+        startBattleCommand.IsCooledDown = isEnabled;
     }
 
     public void Awake()
@@ -97,19 +99,23 @@ public class SkillbarController : MonoBehaviour {
             if (!this.gameObject.activeInHierarchy || leaderActor == null)
                 yield return new WaitForSeconds(0.1f);
 
-            for (int i = 0; i < ActiveSkills.Count; i++)
-            {
-                Command toShow = leaderActor.GetCommandAtSlotIndex(i);
-                if (toShow == null)
-                    continue;
-
-                ActiveSkills[i].GetComponent<Command>().ShowCommandDisplay(leaderActor.GetCommandAtSlotIndex(i), false);
-
-                if (i == SelectedIndex)
-                    ActiveSkills[i].GetComponent<Command>().ShowCommandDisplay(leaderActor.GetCommandAtSlotIndex(i), true);
-            }
-
+            RefreshUI();
             yield return new WaitForSeconds(updateDelay);
+        }
+    }
+
+    public void RefreshUI()
+    {
+        for (int i = 0; i < ActiveSkillsUIObjects.Count; i++)
+        {
+            Command toShow = leaderActor.GetCommandAtSlotIndex(i);
+            if (toShow == null)
+                continue;
+
+            ActiveSkillsUIObjects[i].GetComponent<Command>().ShowCommandDisplay(leaderActor.GetCommandAtSlotIndex(i), false);
+
+            if (i == SelectedIndex)
+                ActiveSkillsUIObjects[i].GetComponent<Command>().ShowCommandDisplay(leaderActor.GetCommandAtSlotIndex(i), true);
         }
     }
 
@@ -121,18 +127,18 @@ public class SkillbarController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             SelectedIndex++;
-            SelectedIndex = Mathf.Clamp(SelectedIndex, 0, ActiveSkills.Count - 1);
+            SelectedIndex = Mathf.Clamp(SelectedIndex, 0, ActiveSkillsUIObjects.Count - 1);
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             SelectedIndex--;
-            SelectedIndex = Mathf.Clamp(SelectedIndex, 0, ActiveSkills.Count - 1);
+            SelectedIndex = Mathf.Clamp(SelectedIndex, 0, ActiveSkillsUIObjects.Count - 1);
         }
 
         if(Input.GetKeyDown(KeyCode.Return))
         {
-            for (int i = 0; i < ActiveSkills.Count; i++)
+            for (int i = 0; i < ActiveSkillsUIObjects.Count; i++)
             {
                 if(i == SelectedIndex)
                 {

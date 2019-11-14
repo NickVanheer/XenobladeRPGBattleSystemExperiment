@@ -57,6 +57,13 @@ public class IdleState : GameState
 
         if (ChainBarDisplayController.Instance != null)
             ChainBarDisplayController.Instance.gameObject.SetActive(false);
+
+        //Reset all skills and their cooldowns
+        foreach (var player in GameManager.Instance.CurrentPartyMembers)
+        {
+            player.GetComponent<RPGActor>().ResetCommands();
+        }
+
     }
 
     public override void StateExit()
@@ -65,15 +72,7 @@ public class IdleState : GameState
 
     public override void StateUpdate()
     {
-        //We don't have a soft target, show the pause/exit game message prompt.
-        bool isSelectingTarget = gameManager.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget && gameManager.GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
-        if (isSelectingTarget)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            gameManager.ExitGamePrompt();
-        }
+       
     }
 }
 
@@ -95,8 +94,6 @@ public class BattleState : GameState
 
         SkillbarController.Instance.EnableAllSkills();
 
-        //Delete to allow the player to engage with multiple enemies
-        SkillbarController.Instance.ToggleAutoAttackSkill(false);
         CoreUIManager.Instance.ShowSkillDisplay();
 
         //Reset all skills and their cooldowns
@@ -106,8 +103,8 @@ public class BattleState : GameState
         }
 
         //Disable initiate battle command icon
-        Command startBattleCommand = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().GetCommandAtSlotIndex(2);
-        startBattleCommand.IsEnabled = false; 
+        //Command startBattleCommand = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().GetCommandAtSlotIndex(2);
+        //startBattleCommand.IsEnabled = false; 
     }
 
     public override void StateExit()
@@ -327,6 +324,17 @@ public class GameManager : MonoBehaviour {
         //update game state (either idle, or battle)
         if (CurrentState != null)
             CurrentState.StateUpdate();
+
+        //We don't have a soft target, show the pause/exit game message prompt.
+        bool isSelectingTarget = GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget && GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
+        if (isSelectingTarget)
+            return;
+
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ExitGamePrompt();
+        }
     }
 
     public BattleResults CalculateBattleResults(RPGActor defeatedEnemy)

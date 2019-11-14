@@ -8,7 +8,7 @@ public class TargetPlayerInRange : MonoBehaviour {
 
 	void Update () {
 
-        if (GameManager.Instance.IsGameOver)
+        if (GameManager.Instance.IsGameOver || GameManager.Instance.GetLeaderActor().State == ActorState.Dead)
             return;
 
         RPGActor enemyActor = GetComponent<RPGActor>();

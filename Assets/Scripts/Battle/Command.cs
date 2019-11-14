@@ -142,6 +142,9 @@ public class Command : MonoBehaviour
 
     public virtual void ResetCommand()
     {
+        if (IsAlwaysActiveCommand)
+            return;
+
         IsCooledDown = false;
         StartCooldown = Cooldown; //By default the cooldown at the beginning of battle is the full cooldown, override in derrived or save/load a value from somewhere (i.e: a character growth system) to change
         CurrentCooldown = StartCooldown;

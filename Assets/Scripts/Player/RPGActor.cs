@@ -361,29 +361,6 @@ public class RPGActor : MonoBehaviour {
         SetTarget(puller);
     }
 
-    public void SetTarget(GameObject target)
-    {
-        this.TargetObject = target;
-
-        if(this.tag == "Player")
-            CoreUIManager.Instance.ShowTargetDisplay(this.TargetObject);
-    }
-
-    public void SetSoftTarget(GameObject target)
-    {
-        this.SoftTargetObject = target;
-    }
-
-    public void UnsetSoftTarget()
-    {
-        this.SoftTargetObject = null;
-    }
-
-    public void TargetSoftTarget()
-    {
-        SetTarget(SoftTargetObject);
-    }
-
     public void EnterDeathState()
     {
         if (State == ActorState.Dead)
@@ -451,9 +428,40 @@ public class RPGActor : MonoBehaviour {
             GameManager.Instance.LogError("Couldn't find gameObject " + gO.name + "in actor " + this.name + "'s list of engaged enemies");
     }
 
+    public void SetTarget(GameObject target)
+    {
+        this.TargetObject = target;
+
+        if (this.tag == "Player")
+            CoreUIManager.Instance.ShowTargetDisplay(this.TargetObject);
+    }
+
+    public void SetSoftTarget(GameObject target)
+    {
+        this.SoftTargetObject = target;
+    }
+
+    public void UnsetSoftTarget()
+    {
+        this.SoftTargetObject = null;
+    }
+
+    public void TargetSoftTarget()
+    {
+        SetTarget(SoftTargetObject);
+    }
+
     public void EngageTarget(bool notifyEnemy = false) 
     {
         Assert.IsNotNull(TargetObject, "Trying to Engage Target that isn't there, set a target with SetTarget()");
+
+        //Don't engage when we're already engaged with this enemy
+        if (EngagedEnemies.Contains(TargetObject))
+            return;
+
+        //Notify the Game Manager the first time around
+        if(GameManager.Instance.CurrentState == GameManager.Instance.StateIdle)
+            GameManager.Instance.EnterBattleState();
 
         //State = ActorState.Engaged;
         EnterEngagedState();
@@ -463,15 +471,6 @@ public class RPGActor : MonoBehaviour {
         {
             foreach (var member in GameManager.Instance.CurrentPartyMembers)
             {
-                /*
-                if (EngagedEnemies.Contains(member))
-                    return;
-
-                //Add to engaged enemy list if target is new
-                EngagedEnemies.Add(member);
-
-                */
-
                 if (!EngagedEnemies.Contains(member))
                     EngagedEnemies.Add(member);
             }

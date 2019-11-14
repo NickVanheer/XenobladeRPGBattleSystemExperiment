@@ -216,7 +216,7 @@ public abstract class BaseAI : MonoBehaviour {
         if (!isMoving)
         {
             Vector3 moveDir = (actor.TargetObject.transform.position - transform.position).normalized * directionIncrement;
-
+            moveDir.y = 0;
             CharacterController cont = GetComponent<CharacterController>();
 
             if(cont != null)
