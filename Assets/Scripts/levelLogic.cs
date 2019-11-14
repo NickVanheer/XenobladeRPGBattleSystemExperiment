@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public enum LevelProgress
 {
-    Started, GatekeeperDefeated, BossDefeated
+    Started, GatekeeperDefeated, BossDefeated, MainTitle
 }
 
 public class levelLogic : MonoBehaviour {
@@ -35,11 +35,18 @@ public class levelLogic : MonoBehaviour {
     public void Start()
     {
         CurrentProgress = LevelProgress.Started;
+        GameManager.Instance.OnEnterIdleState += OnEnterIdle;
 
         if(IsStartAtSpawnPoint2)
             GameManager.Instance.GetPartyLeader().GetComponent<Respawn>().RespawnAllAtSpawnPoint(PhaseTwoSpawnPoint);
+       
+    }
 
+    //The beginning of the game
+    void OnEnterIdle()
+    {
         EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
+        CurrentProgress = LevelProgress.Started;
     }
 
     public void Update()
@@ -68,6 +75,7 @@ public class levelLogic : MonoBehaviour {
         if(CurrentProgress == LevelProgress.BossDefeated)
         {
             //You won!
+            GameManager.Instance.Gold += 200 * BossLevel;
         }
     }
 

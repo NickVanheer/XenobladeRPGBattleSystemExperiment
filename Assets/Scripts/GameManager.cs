@@ -27,6 +27,9 @@ public class GameStartState : GameState
     {
         CoreUIManager.Instance.HideTargetDisplay();
         CoreUIManager.Instance.HideSkillDisplay();
+        CoreUIManager.Instance.HideRevivePrompt();
+
+        ChainBarDisplayController.Instance.gameObject.SetActive(false);
     }
 
     public override void StateExit()
@@ -35,7 +38,7 @@ public class GameStartState : GameState
 
     public override void StateUpdate()
     {
-        gameManager.EnterIdleState();
+            gameManager.EnterIdleState();
     }
 }
 
@@ -63,7 +66,8 @@ public class IdleState : GameState
     public override void StateUpdate()
     {
         //We don't have a soft target, show the pause/exit game message prompt.
-        if(Input.GetKeyDown(KeyCode.Escape) && !gameManager.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget)
+        bool isSelectingTarget = gameManager.GetPartyLeader().GetComponent<PlayerTargetNearest>().HasSoftTarget && gameManager.GetPartyLeader().GetComponent<RPGActor>().State == ActorState.Idle;
+        if (Input.GetKeyDown(KeyCode.Escape) && !isSelectingTarget)
         {
             gameManager.ExitGamePrompt();
         }
@@ -171,6 +175,7 @@ public class GameOverState : GameState
         gameManager.GameOverPrompt();
         Camera.main.GetComponent<PlayerCameraFollow>().enabled = false;
         Camera.main.GetComponent<RotateAroundTarget>().enabled = true;
+        Camera.main.GetComponent<RotateAroundTarget>().target = gameManager.GetPartyLeader().transform;
     }
 
     public override void StateExit()
@@ -221,6 +226,8 @@ public class GameManager : MonoBehaviour {
     public GameOverState StateGameOver;
     public GameState CurrentState;
 
+    public UnityAction OnEnterIdleState;
+
     public string CurrentStateString;
 
     public List<GameObject> CurrentPartyMembers = new List<GameObject>();
@@ -247,6 +254,9 @@ public class GameManager : MonoBehaviour {
 
     public int ActiveAOEs = 0;
     public bool IsMainMenu = false;
+    public Camera MainTitleCamera;
+    public Camera MainCamera;
+    public GameObject MainTitleText;
 
     void Awake()
     {
@@ -263,6 +273,7 @@ public class GameManager : MonoBehaviour {
             Debug.Log("GameManager and localization info initialized");
 
             KeyLayout = KeyboardLayout.Azerty;
+            MainCamera = Camera.main;
 
             if (IsDebugUseAzerty)
                 return;
@@ -346,6 +357,11 @@ public class GameManager : MonoBehaviour {
         return null;
     }
 
+    public RPGActor GetLeaderActor()
+    {
+        return GetPartyLeader().GetComponent<RPGActor>();
+    }
+
     public GameObject GetPartyLeaderFloorObject()
     {
         if (CurrentPartyMembers[0] != null)
@@ -389,6 +405,8 @@ public class GameManager : MonoBehaviour {
 
     public void EnterIdleState()
     {
+        OnEnterIdleState();
+
         if (CurrentState != StateIdle)
             ChangeState(StateIdle);
         else
@@ -440,7 +458,6 @@ public class GameManager : MonoBehaviour {
         Vector3 tryPos = GetPartyLeader().transform.position + UnityEngine.Random.insideUnitSphere * range;
         tryPos.y = GetPartyLeader().transform.position.y;
 
-        //raycast check
         bool isHit = Physics.Raycast(tryPos, new Vector3(0, -1, 0), 5);
 
         if (isHit)
@@ -451,19 +468,11 @@ public class GameManager : MonoBehaviour {
 
     public bool IsUnitGrounded()
     {
-        return true;
-        //TODO
- /*
-        tryPos.y = GetPartyLeader().transform.position.y;
+        Vector3 pos = GetPartyLeader().GetComponent<PlayerShoot>().SpawnPosition.position;
 
-        //raycast check
-        bool isHit = Physics.Raycast(tryPos, new Vector3(0, -1, 0), 5);
-
-        if (isHit)
-            return tryPos;
-        else
-            return GetAvailableRandomPosition(range - 4);
-        */
+        bool isHit = Physics.Raycast(pos, new Vector3(0, -1, 0), 4);
+        return isHit;
+        
     }
 
     public void SpawnAoE(GameObject instigator, Vector3 position, int damage, float duration = 3f)

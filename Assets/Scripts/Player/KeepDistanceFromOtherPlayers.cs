@@ -56,6 +56,9 @@ public class KeepDistanceFromOtherPlayers : MonoBehaviour {
 
     private void LateUpdate()
     {
-        GetComponent<CharacterController>().Move(offset * Time.deltaTime * Speed);
+        CharacterController c = GetComponent<CharacterController>();
+
+        if (c != null)
+            GetComponent<CharacterController>().Move(offset * Time.deltaTime * Speed);
     }
 }
