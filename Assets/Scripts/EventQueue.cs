@@ -146,17 +146,24 @@ public class FocusEvent : Event
 {
     public GameObject gFocusObject;
     public float Duration = 3f;
+    public FocusMode Mode;
 
-    public FocusEvent(GameObject target, float duration)
+    public FocusEvent(GameObject target, float duration, FocusMode mode)
     {
         this.gFocusObject = target;
         this.Duration = duration;
+        this.Mode = mode;
     }
 
     public override void EventStart()
     {
         base.EventStart();
-        Camera.main.GetComponent<FocusCamera>().Focus(gFocusObject, Duration, OnClose);
+
+        if(Mode == FocusMode.Slide)
+            Camera.main.GetComponent<FocusCamera>().SlideCameraFocus(gFocusObject, Duration, OnClose);
+
+        if (Mode == FocusMode.Static)
+            Camera.main.GetComponent<FocusCamera>().StaticCameraFocus(gFocusObject, Duration, OnClose);
     }
 
     public void OnClose()
@@ -319,9 +326,9 @@ public class EventQueue : MonoBehaviour {
         gameEvents.Enqueue(ev);
     }
 
-    public void AddFocusEvent(GameObject target, float duration)
+    public void AddFocusEvent(GameObject target, float duration, FocusMode mode)
     {
-        FocusEvent fe = new FocusEvent(target, duration);
+        FocusEvent fe = new FocusEvent(target, duration, mode);
         gameEvents.Enqueue(fe);
     }
 

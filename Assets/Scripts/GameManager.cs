@@ -236,6 +236,7 @@ public class GameManager : MonoBehaviour {
 
     public GameObject PotionPickupPrefab;
     public float PotionThrust;
+    public GameObject GoldPickupPrefab;
     public int Gold = 0;
 
     public GameObject AreaOfEffectPrefab;
@@ -344,12 +345,9 @@ public class GameManager : MonoBehaviour {
         //allocate exp
         BattleResults results = default(BattleResults);
         int expToAdd = defeatedEnemy.Properties.EarnedExperience;
-        int goldToAdd = defeatedEnemy.Properties.EarnedGold;
 
-        //add additional exp from passive bonusses, rest time, etc.
-
+        //add additional exp from passive bonusses, rest time, etc, extra gold.
         results.Experience = expToAdd;
-        results.Gold = goldToAdd;
         return results;
     }
 
@@ -451,6 +449,16 @@ public class GameManager : MonoBehaviour {
                     member.GetComponent<RPGActor>().RestoreHP(percentage, showDamageNumber);
             }
         }
+    }
+
+    public void SpawnGold(int amount, Vector3 position)
+    {
+        if (GoldPickupPrefab == null)
+            return;
+
+        GameObject gold = Instantiate(GoldPickupPrefab, position, Quaternion.identity);
+        gold.GetComponent<MoneyPickup>().GoldToAdd = amount;
+
     }
 
     public void SpawnHealthPotion()
@@ -576,11 +584,11 @@ public class GameManager : MonoBehaviour {
         if (WarriorGuest == null)
             return;
 
-        //Vector3 position = GetPartyLeader().transform.position + new Vector3(UnityEngine.Random.Range(-20, 20), 0, UnityEngine.Random.Range(-20, 20));
         GameObject member = Instantiate(WarriorGuest, GuestSpawnLocation.position, Quaternion.identity);
 
         CurrentPartyMembers.Add(member);
         CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
+        CoreUIManager.Instance.SpawnNewPlayerParticles(GuestSpawnLocation.position);
     }
 
     public void SpawnWhiteMageGuest()
@@ -592,6 +600,7 @@ public class GameManager : MonoBehaviour {
 
         CurrentPartyMembers.Add(member);
         CoreUIManager.Instance.AddPlayerBox(member.GetComponent<RPGActor>());
+        CoreUIManager.Instance.SpawnNewPlayerParticles(GuestSpawnLocation.position);
     }
 
     public void BuyPartyUpgradePrompt()
@@ -634,26 +643,6 @@ public class GameManager : MonoBehaviour {
         noOption.actionToPerform = () => { EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("Kaomoji"), 1f); };
 
         CoreUIManager.Instance.ShowMessageBoxWithOptions(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", warriorOption, whiteMageOption, noOption);
-
-        /*
-        UnityAction yesAction = () =>
-        {
-            if (Gold >= PartyUpgradePrice)
-            {
-                Gold -= PartyUpgradePrice;
-                SpawnGuestMember();
-                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("PartyUpgraded"), 1f);
-            }
-            else
-            {
-                EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("NotEnoughMoney"), 1f);
-            }
-
-        };
-        UnityAction noAction = () => { EventQueue.Instance.AddMessageBox(LocalizationManager.Instance.GetLocalizedValue("Kaomoji"), 1f); };
-
-        CoreUIManager.Instance.ShowYesNoMessageBox(LocalizationManager.Instance.GetLocalizedValue("UpgradePartyPrompt") + " " + "(" + PartyUpgradePrice + " " + LocalizationManager.Instance.GetLocalizedValue("Gold") + ")", yesAction, noAction);
-    */
     }
 
     public void GameOverPrompt()

@@ -48,7 +48,7 @@ public class levelLogic : MonoBehaviour {
     {
         if (!isStartFocusAnimationPlayed)
         {
-            EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
+            EventQueue.Instance.AddFocusEvent(Phase1Door, 3, FocusMode.Static);
             CurrentProgress = LevelProgress.Started;
             isStartFocusAnimationPlayed = true;
         }
@@ -57,11 +57,11 @@ public class levelLogic : MonoBehaviour {
     public void Update()
     {
         BossLevelTextMesh.text = BossLevel.ToString();
-        if (CurrentProgress != LevelProgress.GatekeeperDefeated && Phase1DestroyedCount >= 1)
+        if (CurrentProgress != LevelProgress.GatekeeperDefeated && Phase1DestroyedCount >= 2)
         {
             EventQueue.Instance.WaitABit(2f);
             EventQueue.Instance.AddAction(() => { Phase1Door.GetComponent<SmoothMoveToPosition>().enabled = true; });
-            EventQueue.Instance.AddFocusEvent(Phase1Door, 3);
+            EventQueue.Instance.AddFocusEvent(Phase1Door, 3, FocusMode.Slide);
             EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("SomethingChanged"), 2);
 
             Phase1DestroyedCount = 0;
@@ -122,7 +122,7 @@ public class levelLogic : MonoBehaviour {
             BossObject.GetComponent<RPGActor>().Properties.ChangeLevel(BossLevel);
             BossObject.GetComponent<RPGActor>().Properties.Name = LocalizationManager.Instance.GetLocalizedValue("BossName");
 
-            EventQueue.Instance.AddFocusEvent(BossObject, 2);
+            EventQueue.Instance.AddFocusEvent(BossObject, 2, FocusMode.Slide);
             EventQueue.Instance.AddQuickInfoPanel(LocalizationManager.Instance.GetLocalizedValue("letsbegin"),1.4f);
         }
     }

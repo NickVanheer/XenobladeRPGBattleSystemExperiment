@@ -8,8 +8,6 @@ public class AggroLineVisualizer : Track {
     public bool IsStraightLine = false;
     public int InterpolationSteps = 8;
     public float ControlPointOffsetY;
-    public Vector3 ActorPointOffsetSource;
-    public Vector3 ActorPointOffsetDestination;
 
     public Color TargettingColor;
     public Color HasBeenTargettedColor;
@@ -46,10 +44,7 @@ public class AggroLineVisualizer : Track {
             line.startColor = HasBeenTargettedColor;
             line.endColor = HasBeenTargettedColor;
 
-            if (IsStraightLine)
-                SetupAggroStraightLine(line);
-            else
-                SetupAggroBezier(line, actor.TargetObject.transform.position);
+            SetupAggroLine(actor.gameObject, actor.TargetObject);
         }
         else if(actor.tag == "Enemy")
         {
@@ -64,13 +59,34 @@ public class AggroLineVisualizer : Track {
             line.endColor = TargettingColor;
 
             line.material.color = TargettingColor;
-            SetupAggroBezier(line, actor.SoftTargetObject.transform.position);
+            SetupAggroLine(actor.gameObject, actor.SoftTargetObject);
         }
         else if(actor.tag == "Player")
         {
             line.enabled = false;
         }
 	}
+
+    public void SetupAggroLine(GameObject source, GameObject target)
+    {
+        //Starting points
+        startPoint = source.transform.position;
+        endPoint = target.transform.position;
+
+        //
+        Transform thisTopPoint = source.transform.FindDeepChild("ActorTopPoint");
+
+        if (thisTopPoint != null)
+            startPoint = thisTopPoint.transform.position;
+
+        //
+        Transform targetTopPoint = target.transform.FindDeepChild("ActorTopPoint");
+
+        if (targetTopPoint != null)
+            endPoint = targetTopPoint.transform.position;
+
+        SetupAggroBezier(line, startPoint, endPoint);
+    }
 
     public override void CalculateStartPoints()
     {
@@ -95,10 +111,8 @@ public class AggroLineVisualizer : Track {
         return p;
     }
 
-    public void SetupAggroBezier(LineRenderer line, Vector3 targetPosition)
+    public void SetupAggroBezier(LineRenderer line, Vector3 startPoint, Vector3 endPoint)
     {
-        startPoint = actor.transform.position + ActorPointOffsetSource;
-        endPoint = targetPosition + ActorPointOffsetDestination;
         controlPoint = (startPoint + endPoint) / 2;
         controlPoint += new Vector3(0, ControlPointOffsetY, 0);
 

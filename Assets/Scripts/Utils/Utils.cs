@@ -14,8 +14,8 @@ public enum KeyboardLayout { Qwerty, Azerty };
 
 public struct BattleResults
 {
-    public int Gold;
     public int Experience;
+    public float Time;
 }
 
 /// <summary>

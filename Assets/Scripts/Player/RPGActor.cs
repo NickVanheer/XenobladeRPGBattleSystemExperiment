@@ -111,7 +111,7 @@ public class RPGActor : MonoBehaviour {
         //Handle death
         if (Properties.CurrentHealth <= 0 && State != ActorState.Dead)
         {
-            EnterDeathState();
+            EnterDeathState(); 
             return;
         }
 
@@ -180,14 +180,23 @@ public class RPGActor : MonoBehaviour {
                 if (this.tag == "Player" && EngagedEnemies[i].GetComponent<RPGActor>().isExpAwarded == false)
                 {
                     AddExperience(EngagedEnemies[i]);
-                    EngagedEnemies[i].GetComponent<RPGActor>().EnterDeathState(); //calls OnDestroyCallback
                     EngagedEnemies[i].GetComponent<RPGActor>().isExpAwarded = true;
-                    Destroy(EngagedEnemies[i]); //we destroy the enemy model too
+                    GameManager.Instance.SpawnGold(this.Properties.EarnedGold, EngagedEnemies[i].GetComponent<RPGActor>().transform.position);
+
+                    EngagedEnemies[i].GetComponent<RPGActor>().DestroyThisActor(); //we destroy the enemy model
                 }
 
                 EngagedEnemies.RemoveAt(i);
             }
         }
+    }
+
+    public void DestroyThisActor()
+    {
+        Assert.IsTrue(this.State == ActorState.Dead); //EnterDeathState should be called somewhere before, this will clean up and call the death callback. Can't destroy an actor when it's not marked as death yet
+
+        SpawnDeathParticles();
+        Destroy(this.gameObject);
     }
 
     public void SpawnDamageParticles(MagicElemancy element)
@@ -218,6 +227,14 @@ public class RPGActor : MonoBehaviour {
         var muzzleParticle = muzzleVFX.GetComponent<ParticleSystem>();
         if (muzzleParticle != null)
             Destroy(muzzleVFX, muzzleParticle.main.duration);
+    }
+
+    public void SpawnDeathParticles()
+    {
+        if (ParticleSpawnPoint == null)
+            return;
+
+        Instantiate(CoreUIManager.Instance.ParticleDeath, ParticleSpawnPoint.transform.position, Quaternion.identity);
     }
 
     //on target
@@ -604,10 +621,9 @@ public class RPGActor : MonoBehaviour {
                 }
             }
 
-            GameManager.Instance.Gold += result.Gold;
-
+            //GameManager.Instance.Gold += result.Gold;
+            //-> Spawn gold pickups instead
             CoreUIManager.Instance.SpawnText(result.Experience + " exp", defeatedEnemyActor);
-            CoreUIManager.Instance.SpawnLabel(result.Gold + "g", this.gameObject);
 
             if (isLevelUp)
                 CoreUIManager.Instance.ShowBigText("Level up!");

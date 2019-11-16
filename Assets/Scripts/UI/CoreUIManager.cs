@@ -60,6 +60,8 @@ public class CoreUIManager : MonoBehaviour {
     public GameObject ParticleMuzzle;
     public GameObject ParticleBounce;
     public GameObject ParticleFire;
+    public GameObject ParticleDeath;
+    public GameObject ParticleNewPlayer;
 
     public SkillbarController SkillBarControl;
 
@@ -339,6 +341,14 @@ public class CoreUIManager : MonoBehaviour {
             targetPos.y += Random.Range(-5, 5);
             gO.transform.position = targetPos;
         }
+    }
+
+    public void SpawnNewPlayerParticles(Vector3 position)
+    {
+        if (ParticleNewPlayer == null)
+            return;
+
+        Instantiate(ParticleNewPlayer, position, Quaternion.identity);
     }
 
     public void SpawnLabel(string text, GameObject target, string IconPath, bool isRedLabel = false)

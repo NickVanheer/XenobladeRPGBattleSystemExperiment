@@ -7,6 +7,7 @@ public class SphereEnemyAI : BaseAI {
     public float CleaveAttackCooldown = 30f;
     public float AoEAttackCooldown = 30f;
     public bool SpawnFallingAoE = false;
+    public　bool HasAoEAttacks = true;
 
     private float aoeTimer = 0;
     private float cleaveTimer = 0;
@@ -29,6 +30,9 @@ public class SphereEnemyAI : BaseAI {
             cleaveTimer = 0f;
             actor.DoDamageAttackWithLabel(10, "(。-`ω´-)", true);
         }
+
+        if(!HasAoEAttacks)
+            return;
 
         aoeTimer += Time.deltaTime;
         if (aoeTimer >= AoEAttackCooldown)
