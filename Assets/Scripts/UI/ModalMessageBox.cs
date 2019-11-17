@@ -44,6 +44,8 @@ public class ModalMessageBox : NovaUIElement {
     public float characterScrollTimer = 0.02f;
     private float characterScrollCurrentTime = 0;
 
+    private float timePassed = 0f;
+
     bool isInitialized = false;
 
     // Use this for initialization
@@ -146,14 +148,20 @@ public class ModalMessageBox : NovaUIElement {
         if (Input.GetKeyDown(KeyCode.Return))
             MoveNext();
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && timePassed > 0.7f)
+        {
             MoveNext();
+            timePassed = 0f;
+        }
+
+        timePassed += Time.deltaTime;
 
         if (textToShow.Length > 0)
         {
             //scrolling text
             characterScrollCurrentTime += Time.deltaTime;
-            float t = Time.deltaTime;
+       
+            //float t = Time.deltaTime;
             if (characterScrollCurrentTime >= characterScrollTimer)
             {
                 characterScrollCurrentTime = 0; //reset

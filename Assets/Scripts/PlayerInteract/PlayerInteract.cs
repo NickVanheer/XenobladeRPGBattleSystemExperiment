@@ -23,28 +23,33 @@ public class PlayerInteract : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (GameManager.Instance.IsPausedForUI)
-                return;
+            ReturnKeyPressed();
+        }
+    }
 
-            if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().State != ActorState.Idle)
-                return;
+    public void ReturnKeyPressed()
+    {
+        if (GameManager.Instance.IsPausedForUI)
+            return;
 
-            if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().SoftTargetObject != null)
-                return;
+        if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().State != ActorState.Idle)
+            return;
 
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, InteractDistance);
-            int i = 0;
-            while (i < hitColliders.Length)
+        if (GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().SoftTargetObject != null)
+            return;
+
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, InteractDistance);
+        int i = 0;
+        while (i < hitColliders.Length)
+        {
+            if (hitColliders[i].gameObject.tag == "Interactable")
             {
-                if(hitColliders[i].gameObject.tag == "Interactable")
-                {
-                    var _interactableObject = hitColliders[i].gameObject.GetComponent<IInteractable>();
-                    if (_interactableObject != null)
-                        _interactableObject.Interact();
-                }
-
-                i++;
+                var _interactableObject = hitColliders[i].gameObject.GetComponent<IInteractable>();
+                if (_interactableObject != null)
+                    _interactableObject.Interact();
             }
+
+            i++;
         }
     }
 

@@ -25,7 +25,6 @@ public class CheckUIClick : MonoBehaviour {
         pointerData.position = Input.mousePosition;
         this.raycaster.Raycast(pointerData, results);
 
-        //For every result returned, output the name of the GameObject on the Canvas hit by the Ray
         foreach (RaycastResult result in results)
         {
             if (result.gameObject.GetComponent<Command>() != null)
@@ -38,6 +37,20 @@ public class CheckUIClick : MonoBehaviour {
                     if (com != null)
                         com.UseCommand();
                 }
+            }
+
+            if (result.gameObject.GetComponent<QTERingController>() != null)
+            {
+                QTERingController r = result.gameObject.GetComponent<QTERingController>();
+                if (Input.GetKeyDown(KeyCode.Mouse0))
+                    r.IsUITouch = true;
+            }
+
+            if (result.gameObject.GetComponentInParent<QTERingController>() != null)
+            {
+                QTERingController r = result.gameObject.GetComponentInParent<QTERingController>();
+                if (Input.GetKeyDown(KeyCode.Mouse0))
+                    r.IsUITouch = true;
             }
         }
     }

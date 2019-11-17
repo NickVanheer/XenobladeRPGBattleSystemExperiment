@@ -56,7 +56,7 @@ public class LineTrackEditor : Editor {
 
         for (int i = 0; i < lineTrack.ShapePoints.Count; i++)
         {
-            lineTrack.ShapePoints[i] = Handles.FreeMoveHandle(lineTrack.ShapePoints[i], Quaternion.identity, 0.4f, Vector2.zero, Handles.CircleCap);
+            lineTrack.ShapePoints[i] = Handles.FreeMoveHandle(lineTrack.ShapePoints[i], Quaternion.identity, 0.4f, Vector2.zero, Handles.CircleHandleCap);
             Handles.Label(lineTrack.ShapePoints[i], string.Format("[{0}]", i.ToString()));
         }
 

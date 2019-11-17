@@ -47,7 +47,7 @@ public class PlayerTargetNearest : MonoBehaviour {
             if(enemy != null)
             {
                 float distance = Vector3.Distance(enemy.transform.position, this.transform.position);
-                if (Mathf.Abs(distance) > enemy.GetComponent<RPGActor>().DisengageDistance)
+                if (Mathf.Abs(distance) > GetComponent<RPGActor>().DisengageDistance)
                 {
                     ClearTargetSelection();
                     return;
@@ -91,7 +91,6 @@ public class PlayerTargetNearest : MonoBehaviour {
                 sameCount++;
         }
 
-
         //We've found some potential enemies, 
         //The amount of new enemies is different from what was there before refresh target list.
         if (found.Count != sameCount)
@@ -113,28 +112,15 @@ public class PlayerTargetNearest : MonoBehaviour {
                 tIndex = 0;
         }
 
-        SoftTarget();
+        softTarget();
     }
-    /*
-    public void SelectEnemyOnTouch(GameObject gO)
+
+    public void SetSoftTarget(GameObject target)
     {
-        GetComponent<RPGActor>().SetSoftTarget(gO);
-
-        CoreUIManager.Instance.ShowTargetDisplay(GetComponent<RPGActor>().SoftTargetObject);
-        CoreUIManager.Instance.ShowSkillDisplay();
-
-        //Reset all skills and their cooldowns
-        foreach (var player in GameManager.Instance.CurrentPartyMembers)
-        {
-            player.GetComponent<RPGActor>().ResetCommands();
-        }
-
-        HasSoftTarget = true;
+        GetComponent<RPGActor>().SetSoftTarget(target);
     }
 
-    */
-
-    void SoftTarget()
+    void softTarget()
     {
         if (targets[tIndex] == null)
             return; 

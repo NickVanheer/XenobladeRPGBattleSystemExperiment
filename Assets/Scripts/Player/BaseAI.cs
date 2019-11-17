@@ -26,7 +26,7 @@ public abstract class BaseAI : MonoBehaviour {
 
     public PositionTowardsEnemy thisRelativeToEnemy;
 
-    void Start () {
+    public virtual void Start () {
         actor = GetComponent<RPGActor>();
         actor.OnDestroyCallBack.AddListener(actorDestroyed);
 

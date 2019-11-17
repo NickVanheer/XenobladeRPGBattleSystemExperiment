@@ -5,7 +5,6 @@ using UnityEngine;
 public class DisengageWhenAway : MonoBehaviour {
 
     public float MoveSpeed = 5;
-    public float Range = 50;
     private Vector3 startingPosition;
     private bool isMovingTowardsStartingPosition = false;
 
@@ -43,8 +42,11 @@ public class DisengageWhenAway : MonoBehaviour {
         {
             //Disengage enemy from everyone that was fighting it when it's straying too far from its original location. 
             float dist = Vector3.Distance(this.transform.position, startingPosition);
+            float dist2 = Vector3.Distance(startingPosition, this.GetComponent<RPGActor>().TargetObject.transform.position);
 
-            if (dist > Range)
+            float disengageDistance = GetComponent<RPGActor>().DisengageDistance;
+
+            if (Mathf.Abs(dist) > disengageDistance || Mathf.Abs(dist2) > disengageDistance)
             {
                 isMovingTowardsStartingPosition = true;
                 GetComponent<RPGActor>().DisengageAllEngagedEnemies();
@@ -60,7 +62,8 @@ public class DisengageWhenAway : MonoBehaviour {
 
     private void OnDrawGizmosSelected()
     {
+        float disengageDistance = GetComponent<RPGActor>().DisengageDistance;
         Gizmos.color = Color.gray;
-        Gizmos.DrawWireSphere(transform.position, Range);
+        Gizmos.DrawWireSphere(transform.position, disengageDistance);
     }
 }

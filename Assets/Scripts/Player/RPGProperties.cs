@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RPGPropertyType { CurrentHealth, MaxHealth, Name, Level, CurrentExperience, CurrentGold, CurrentSkillName, CurrentSkillDescription, IsBreak, IsTopple, IsDead };
+public enum RPGPropertyType { CurrentHealth, MaxHealth, Name, Level, CurrentExperience, CurrentGold, CurrentSkillName, CurrentSkillDescription, IsBreak, IsTopple, IsDead, NameLocalized };
 
 public enum UnitWeakness
 {
@@ -14,6 +14,7 @@ public enum UnitWeakness
 public class RPGProperties
 {
     public string Name;
+    public string NameLocalizationTag;
     [Header("Unit Level Properties")]
     public int Level = 3;
     public int StartExperience = 90;
@@ -23,7 +24,6 @@ public class RPGProperties
     [Header("Unit Basic Properties")]
     public int CurrentHealth = 100;
     public int MaxHealth = 100;
-    private int baseHealth;
 
     public int WeaponAttack = 12;
     public int Strength; //physical offense power
@@ -59,7 +59,6 @@ public class RPGProperties
 
     public RPGProperties()
     {
-        this.baseHealth = MaxHealth;
     }
 
     //increases or decreases health
@@ -179,7 +178,11 @@ public class RPGProperties
             result = this.Name.ToString();
 
         if (type == RPGPropertyType.Level)
-            result = this.Level.ToString();     
+            result = this.Level.ToString();
+
+        if (type == RPGPropertyType.NameLocalized)
+            result = LocalizationManager.Instance.GetLocalizedValue(NameLocalizationTag);
+
 
         return result;
     }

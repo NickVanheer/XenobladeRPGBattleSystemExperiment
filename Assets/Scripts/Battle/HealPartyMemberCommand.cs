@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class HealPartyMemberCommand : Command {
@@ -13,9 +14,9 @@ public class HealPartyMemberCommand : Command {
             RPGActor weakestUnit = this.GetComponent<RPGActor>();
             float lowestHealth = 99999999;
 
-            foreach (var player in partyMembers)
+            foreach (var player in partyMembers.Where(p => p.State != ActorState.Dead))
             {
-                if (player.Properties.CurrentHealth < lowestHealth)
+                if (player.Properties.CurrentHealth < lowestHealth) 
                 {
                     lowestHealth = player.Properties.CurrentHealth;
                     weakestUnit = player;

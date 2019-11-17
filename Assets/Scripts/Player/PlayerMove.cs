@@ -41,10 +41,11 @@ public class PlayerMove : MonoBehaviour {
 
     void Update()
     {
-        if (!IsEnabled || GetComponent<RPGActor>().State == ActorState.Dead || GameManager.Instance.IsPausedForUI)
-        {
+        if (GameManager.Instance.IsPausedForUI)
             return;
-        }
+
+        if (!IsEnabled || GetComponent<RPGActor>().State == ActorState.Dead)
+            return;
 
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = 0f;
@@ -57,9 +58,15 @@ public class PlayerMove : MonoBehaviour {
         else
             HandleInputQuerty(ref keyMove);
 
-        if(Input.GetMouseButton(0))
+        //Mouse movement
+        if (Input.GetMouseButton(0))
         {
-            Vector3 mousePos = GetWorldPoint();
+            var hit = GetWorldPointHitInfo();
+            Vector3 mousePos = this.transform.position;
+
+            if (hit.HasValue)
+                mousePos = hit.Value.point;
+
             Vector3 dir = mousePos - this.transform.position;
             dir.y = 0;
             keyMove = dir.normalized;
@@ -103,6 +110,22 @@ public class PlayerMove : MonoBehaviour {
         //Apply gravity
         controller.Move(velocity * Time.deltaTime);
 
+        //Touch input for world objects
+        if (Input.GetMouseButtonDown(0))
+        {
+            var hit = GetWorldPointHitInfo();
+
+            if (hit.HasValue)
+            {
+                if (hit.Value.collider.gameObject.tag == "Enemy")
+                    GetComponent<PlayerTargetNearest>().SetSoftTarget(hit.Value.collider.gameObject); //Target the enemy
+
+                if (hit.Value.collider.gameObject.tag == "Interactable") //Interact with NPCs
+                    GetComponent<PlayerInteract>().ReturnKeyPressed();
+            }
+        }
+
+
         //LeftStickInput();
         //RightStickInput();
     }
@@ -130,6 +153,17 @@ public class PlayerMove : MonoBehaviour {
         if (Input.GetKey(KeyCode.W))
             keyMove.z = 1;
     }
+
+    RaycastHit? GetWorldPointHitInfo()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 5000f))
+            return hit;
+
+        return null;
+    }
+
 
     Vector3 GetWorldPoint()
     {

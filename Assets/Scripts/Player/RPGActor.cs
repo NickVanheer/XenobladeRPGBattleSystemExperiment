@@ -139,7 +139,7 @@ public class RPGActor : MonoBehaviour {
 
             //target has died, assign new one or exit state
             if (Target == null && EngagedEnemies.Count > 0)
-                    SetTarget(EngagedEnemies[0]); //DO engaged enemies count in gamemanager
+                    SetTarget(EngagedEnemies[0]); 
         }
 	}
 
@@ -297,24 +297,26 @@ public class RPGActor : MonoBehaviour {
             ChainBarDisplayController.Instance.AddToChainBar(1.5f);
 
         RPGActor targetActor = target.GetComponent<RPGActor>();
-        TargetObject = target;
 
         //If target is not engaged, engage it with this actor
         if (targetActor.State == ActorState.Idle)
         {
-            targetActor.SetTarget(this.gameObject);
-            targetActor.EngageTarget(); //notify the enemy too.
-
-            //Surprise attack, also set the soft target and maybe do more later?
-            if (TargetObject.tag == "Player" && GameManager.Instance.CurrentState == GameManager.Instance.StateIdle)
+            if (target.tag == "Player" /* && GameManager.Instance.CurrentState == GameManager.Instance.StateIdle */)
             {
                 targetActor.SetSoftTarget(this.gameObject);
-                GameManager.Instance.EnterBattleState();
-
                 GameManager.Instance.Log("Attacked target is a player who was idle, now entering battle state and showing UI");
             }
-        }
 
+            this.TargetObject = target; //Set current target to this enemy
+            targetActor.SetTarget(this.gameObject);
+            targetActor.EngageTarget(); //notify the enemy.
+        }
+        else if(targetActor.State == ActorState.Engaged)
+        {
+            AddToEngaged(target); //When target is already in battle, add to engaged but don't set the current target
+        }
+        
+        //
         var playerShoot = GetComponent<PlayerShoot>();
         if (playerShoot != null && target != null)
         {
@@ -450,6 +452,9 @@ public class RPGActor : MonoBehaviour {
             GameManager.Instance.Log("Going into Idle state while already in that state for unit " + this.name);
             return;
         }
+        this.EngagedEnemies.Clear();
+        this.TargetObject = null;
+        this.SoftTargetObject = null;
         State = ActorState.Idle;
         EnterIdleStateCallBack.Invoke();
         GetComponent<BaseAI>().ResetOnEnterIdleState(); 
@@ -530,7 +535,6 @@ public class RPGActor : MonoBehaviour {
             GameManager.Instance.EnterBattleState();
 
         //State = ActorState.Engaged;
-        EnterEngagedState();
 
         //If we engage the player we engage the whole party!
         if(this.TargetObject.tag == "Player")
@@ -549,6 +553,32 @@ public class RPGActor : MonoBehaviour {
             //Add to engaged enemy list if target is new
             EngagedEnemies.Add(this.TargetObject);
         }
+
+        EnterEngagedState();
+    }
+
+    public void AddToEngaged(GameObject enemy)
+    {
+        //Don't engage when we're already engaged with this enemy
+        if (EngagedEnemies.Contains(enemy))
+            return;
+
+        //If we engage the player we engage the whole party!
+        if (enemy.tag == "Player")
+        {
+            foreach (var member in GameManager.Instance.CurrentPartyMembers)
+            {
+                if (!EngagedEnemies.Contains(member))
+                    EngagedEnemies.Add(member);
+            }
+        }
+        else
+        {
+            //Add to engaged enemy list if target is new
+            EngagedEnemies.Add(enemy);
+        }
+
+        EnterEngagedState();
     }
 
     private void Reset()
@@ -702,6 +732,13 @@ public class RPGActor : MonoBehaviour {
             return true;
 
         return false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        float disengageDistance = DisengageDistance;
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireSphere(transform.position, disengageDistance);
     }
 
     #region Commands

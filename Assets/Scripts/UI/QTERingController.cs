@@ -17,6 +17,8 @@ public class QTERingController : MonoBehaviour {
     float scale = 1.0f;
     float MinScaleRange = 0.6f;
 
+    public bool IsUITouch = false;
+
     static QTERingController instance;
     public static QTERingController Instance
     {
@@ -41,12 +43,19 @@ public class QTERingController : MonoBehaviour {
         HideQTE();
     }
 
+    bool HasInput()
+    {
+        if (Input.GetKeyDown(KeyCode.F) || IsUITouch)
+            return true;
+        return false;
+    }
+
     void Update () {
 
         if (IsHidden)
             return;
 
-        if(Input.GetKeyDown(KeyCode.F) && !IsPressed)
+        if(HasInput() && !IsPressed)
         {
             IsPressed = true;
 
@@ -116,6 +125,7 @@ public class QTERingController : MonoBehaviour {
         OuterCircle.SetActive(true);
         IsHidden = false;
         IsHit = false;
+        IsUITouch = false;
     }
 
     public void HideQTE()

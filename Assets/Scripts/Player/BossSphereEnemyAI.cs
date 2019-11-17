@@ -10,6 +10,14 @@ public class BossSphereEnemyAI : BaseAI {
     float aoeTimer;
     float groupTimer;
 
+    public override void Start()
+    {
+        base.Start();
+        RPGActor thisActor = GetComponent<RPGActor>();
+        thisActor.Properties.EarnedGold = thisActor.Properties.Level * 120;
+    }
+
+
     public override void DefaultAttack()
     {
         if(aoeTimer > AoECooldown)

@@ -49,9 +49,6 @@ public class IdleState : GameState
 
     public override void StateEntry()
     {
-        //CoreUIManager.Instance.HideTargetDisplay();
-        //CoreUIManager.Instance.HideSkillDisplay();
-
         if(CoreUIManager.Instance.SkillBarControl != null)
             CoreUIManager.Instance.SkillBarControl.InitializeSkills();
 
@@ -101,10 +98,6 @@ public class BattleState : GameState
         {
             player.GetComponent<RPGActor>().ResetCommands();
         }
-
-        //Disable initiate battle command icon
-        //Command startBattleCommand = GameManager.Instance.GetPartyLeader().GetComponent<RPGActor>().GetCommandAtSlotIndex(2);
-        //startBattleCommand.IsEnabled = false; 
     }
 
     public override void StateExit()

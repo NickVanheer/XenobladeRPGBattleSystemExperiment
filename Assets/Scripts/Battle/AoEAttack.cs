@@ -33,6 +33,12 @@ public class AoEAttack : MonoBehaviour {
 
     void FallingAoECallback()
     {
+        if (Instigator == null || Instigator.GetComponent<RPGActor>().State != ActorState.Engaged)
+        {
+            GameObject.Destroy(this.gameObject);
+            return;
+        }
+
         var intersectList = GetIntersects();
 
         foreach (var item in intersectList)
