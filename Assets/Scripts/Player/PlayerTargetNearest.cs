@@ -12,9 +12,6 @@ public class PlayerTargetNearest : MonoBehaviour {
 
 	void Update () {
 
-        //if (GetComponent<RPGActor>().State == ActorState.Engaged)
-            //return;
-
         if(GetComponent<RPGActor>().State == ActorState.Dead)
         {
             ClearTargetSelection();
@@ -41,7 +38,6 @@ public class PlayerTargetNearest : MonoBehaviour {
                 SkillbarController.Instance.EnableEngageAttackSkill(true);
 
             //check distance and untarget when too far away 
-            //TODO: Check if this can be incorporated into DisengageWhenDistanceBetweenEnemy.cs
             GameObject enemy = GetComponent<RPGActor>().SoftTargetObject;
 
             if(enemy != null)

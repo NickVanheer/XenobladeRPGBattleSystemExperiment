@@ -29,7 +29,7 @@ public class RPGActor : MonoBehaviour {
     {
         get
         {
-            return this.tag == "Player";
+            return this.gameObject.tag == "Player";
         }
     }
 
@@ -63,17 +63,11 @@ public class RPGActor : MonoBehaviour {
     public GameObject previousTarget;
 
     public bool IsLeader = false;
-
     private bool isExpAwarded = false;
 
     private void Start()
     {
         Reset();
-    }
-
-    public bool IsPlayer()
-    {
-        return this.gameObject.tag == "Player";
     }
 
     void HandleUIForLeader()
@@ -181,7 +175,7 @@ public class RPGActor : MonoBehaviour {
                 {
                     AddExperience(EngagedEnemies[i]);
                     EngagedEnemies[i].GetComponent<RPGActor>().isExpAwarded = true;
-                    GameManager.Instance.SpawnGold(this.Properties.EarnedGold, EngagedEnemies[i].GetComponent<RPGActor>().transform.position);
+                    GameManager.Instance.SpawnGold(EngagedEnemies[i].GetComponent<RPGActor>().Properties.EarnedGold, EngagedEnemies[i].GetComponent<RPGActor>().transform.position);
 
                     EngagedEnemies[i].GetComponent<RPGActor>().DestroyThisActor(); //we destroy the enemy model
                 }
@@ -293,7 +287,7 @@ public class RPGActor : MonoBehaviour {
 
     public void DoDamageAttack(int damage, MagicElemancy element, GameObject target, float fontIncrement = 0, bool isSpecialDamage = false)
     {
-        if (IsPlayer())
+        if (isPlayer)
             ChainBarDisplayController.Instance.AddToChainBar(1.5f);
 
         RPGActor targetActor = target.GetComponent<RPGActor>();
